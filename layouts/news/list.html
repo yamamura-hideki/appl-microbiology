@@ -1,20 +1,4 @@
 {{ define "main" }}
 {{ partial "page-head.html" . }}
-<div class="wrap content-wrap">
-  {{ range .Pages.GroupByDate "2006年" }}
-  <h2 class="year">{{ .Key }}</h2>
-  <ul class="news-cards">
-    {{ range .Pages }}
-    <li>
-      <a href="{{ .RelPermalink }}" class="news-card">
-        {{ $th := .Params.thumbnail }}
-        {{ if and (not $th) .Params.images }}{{ $th = (index .Params.images 0).src }}{{ end }}
-        <div class="thumb">{{ with $th }}<img src="{{ partial "u.html" . }}" alt="" loading="lazy">{{ else }}<span>NEWS</span>{{ end }}</div>
-        <div><time>{{ .Date.Format "2006年1月" }}</time><p>{{ .Title }}</p></div>
-      </a>
-    </li>
-    {{ end }}
-  </ul>
-  {{ end }}
-</div>
+{{ partial "blog-list.html" (dict "page" . "pages" .Pages) }}
 {{ end }}

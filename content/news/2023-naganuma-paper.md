@@ -1,5 +1,6 @@
 ---
 title: "社会人博士課程の長沼さんが行った研究成果が発表されました"
+categories: ["論文・研究成果"]
 date: 2023-12-01
 link: "https://pubmed.ncbi.nlm.nih.gov/36564595/"
 ---

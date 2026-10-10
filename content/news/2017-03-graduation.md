@@ -1,5 +1,6 @@
 ---
 title: "9名が平成28年度卒業・修了式を迎えました"
+categories: ["研究室行事"]
 date: 2017-03-23
 show_day: true
 images:

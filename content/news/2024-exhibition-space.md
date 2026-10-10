@@ -1,5 +1,6 @@
 ---
 title: "研究室前の廊下に展示スペースが出来上がりました"
+categories: ["研究室行事"]
 date: 2024-06-04
 link: "/lab/exhibition/"
 images:

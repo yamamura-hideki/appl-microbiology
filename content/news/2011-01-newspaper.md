@@ -1,5 +1,6 @@
 ---
 title: "放線菌（有用微生物）の研究が新聞に掲載されました"
+categories: ["メディア掲載"]
 date: 2011-01-01
 images:
   - src: "/images/d1dce9_b5b7730ef87a471a9cb765e388207dd8.jpg"

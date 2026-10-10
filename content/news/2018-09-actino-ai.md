@@ -1,5 +1,6 @@
 ---
 title: "放線菌×AI：日本放線菌学会大会で共同研究成果を発表、中島君がポスター賞を受賞"
+categories: ["学会発表", "受賞"]
 date: 2018-09-01
 thumbnail: "/images/d1dce9_6986e90ff1fd4051aa751c720d8a29e1.jpg"
 images:

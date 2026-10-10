@@ -1,0 +1,29 @@
+{{ $news := where site.RegularPages "Section" "news" }}
+{{ $arch := site.GetPage "/news-archive" }}
+<aside class="b-side">
+  {{ with $arch }}
+  <section class="b-box">
+    <h3>記事を検索</h3>
+    <form class="b-search" action="{{ .RelPermalink }}" method="get" role="search">
+      <input type="search" name="q" placeholder="キーワード" aria-label="キーワード">
+      <button type="submit">検索</button>
+    </form>
+  </section>
+  {{ end }}
+  <section class="b-box">
+    <h3>最新の記事</h3>
+    <ul class="b-recent">{{ range first 5 $news }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a><time>{{ .Date.Format "2006.01.02" }}</time></li>{{ end }}</ul>
+  </section>
+  {{ with site.Taxonomies.categories }}
+  <section class="b-box">
+    <h3>カテゴリー</h3>
+    <ul class="b-terms">{{ range .ByCount }}<li><a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a><span>{{ .Count }}</span></li>{{ end }}</ul>
+  </section>
+  {{ end }}
+  {{ with $arch }}
+  <section class="b-box">
+    <h3>アーカイブ</h3>
+    <ul class="b-terms">{{ range $news.GroupByDate "2006" }}<li><a href="{{ $arch.RelPermalink }}#y{{ .Key }}">{{ .Key }}年</a><span>{{ len .Pages }}</span></li>{{ end }}</ul>
+  </section>
+  {{ end }}
+</aside>

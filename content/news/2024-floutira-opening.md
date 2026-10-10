@@ -1,5 +1,6 @@
 ---
 title: "大村記念微生物資源フロウティラ開所式・シンポジウムが行われました"
+categories: ["研究室行事"]
 date: 2024-06-01
 link: "/lab/exhibition/"
 images:

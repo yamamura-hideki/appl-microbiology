@@ -1,5 +1,6 @@
 ---
 title: "ミャンマーで放線菌の探索を行いました"
+categories: ["研究活動"]
 date: 2014-12-01
 thumbnail: "/images/d1dce9_84a51a19ed1e43df8a840b3592b5279b.jpg"
 images:

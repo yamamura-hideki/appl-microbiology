@@ -1,5 +1,6 @@
 ---
 title: "2014年度日本放線菌学会大会でポスター賞を受賞しました"
+categories: ["受賞", "学会発表"]
 date: 2014-06-20
 thumbnail: "/images/d1dce9_0faff5782b814b55816a9abca2b835fc.jpg"
 ---

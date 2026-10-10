@@ -33,8 +33,9 @@ collections:
     fields:
       - { name: title, label: タイトル, widget: string }
       - { name: date, label: 日付, widget: datetime, format: "YYYY-MM-DD", time_format: false, date_format: "YYYY-MM-DD" }
+      - { name: categories, label: "カテゴリー（複数選択可）", widget: select, multiple: true, required: false, options: ["論文・研究成果", "学会発表", "受賞", "共同研究", "研究活動", "研究室行事", "メディア掲載", "お知らせ"] }
       - { name: show_day, label: "日付を「日」まで表示する", widget: boolean, default: false, required: false }
-      - { name: thumbnail, label: "サムネイル画像（一覧用・省略可）", widget: image, required: false }
+      - { name: thumbnail, label: "アイキャッチ画像（一覧と記事の先頭に表示・省略時は写真ギャラリーの1枚目）", widget: image, required: false }
       - { name: link, label: "関連リンク（URL・省略可）", widget: string, required: false }
       - name: images
         label: 写真ギャラリー

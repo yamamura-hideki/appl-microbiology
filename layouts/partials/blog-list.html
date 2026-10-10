@@ -1,0 +1,15 @@
+{{/* 引数: dict "page" . "pages" (ページ一覧) "title" "見出し" */}}
+{{ $pg := .page.Paginate .pages }}
+<div class="wrap b-layout">
+  <div class="b-main">
+    {{ range $pg.Pages }}{{ partial "blog-card.html" . }}{{ end }}
+    {{ if gt $pg.TotalPages 1 }}
+    <nav class="b-pager" aria-label="ページ送り">
+      {{ with $pg.Prev }}<a href="{{ .URL }}">← 新しい記事</a>{{ else }}<span></span>{{ end }}
+      <span class="b-pages">{{ range $pg.Pagers }}{{ if eq . $pg }}<b>{{ .PageNumber }}</b>{{ else }}<a href="{{ .URL }}">{{ .PageNumber }}</a>{{ end }}{{ end }}</span>
+      {{ with $pg.Next }}<a href="{{ .URL }}">古い記事 →</a>{{ else }}<span></span>{{ end }}
+    </nav>
+    {{ end }}
+  </div>
+  {{ partial "blog-sidebar.html" .page }}
+</div>

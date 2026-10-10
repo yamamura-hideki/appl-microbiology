@@ -1,5 +1,6 @@
 ---
 title: "早川正幸名誉教授が日本放線菌学会名誉会員章を受章されました"
+categories: ["受賞"]
 date: 2021-09-18
 show_day: true
 images:

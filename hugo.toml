@@ -18,6 +18,10 @@ enableRobotsTXT = true
   unsafe = true
 
 [taxonomies]
+  category = "categories"
+
+[pagination]
+  pagerSize = 8
 
 [menus]
   [[menus.main]]

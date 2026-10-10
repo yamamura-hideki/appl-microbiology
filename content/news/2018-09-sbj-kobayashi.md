@@ -1,5 +1,6 @@
 ---
 title: "修士1年の小林日花梨さんが日本生物工学会大会（関西大学）で口頭発表を行いました"
+categories: ["学会発表"]
 date: 2018-09-01
 thumbnail: "/images/fc7f96f02dc0450b9419da9e6e8988cf.jpg"
 ---

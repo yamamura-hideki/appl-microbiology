@@ -1,0 +1,12 @@
+{{ $th := partial "blog-thumb.html" . }}
+<article class="b-card">
+  <a class="b-card-img{{ if not $th }} is-empty{{ end }}" href="{{ .RelPermalink }}" tabindex="-1" aria-hidden="true">
+    {{ with $th }}<img src="{{ partial "u.html" . }}" alt="" loading="lazy">{{ else }}<span>NEWS</span>{{ end }}
+  </a>
+  <div class="b-card-body">
+    <div class="b-meta">{{ partial "blog-cats.html" . }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time></div>
+    <h2 class="b-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+    {{ with .Summary | plainify | htmlUnescape }}<p class="b-excerpt">{{ . | truncate 90 }}</p>{{ end }}
+    <a class="b-more" href="{{ .RelPermalink }}">続きを読む →</a>
+  </div>
+</article>

@@ -1,5 +1,6 @@
 ---
 title: "8名が平成22年度卒業・修了式を迎えました"
+categories: ["研究室行事"]
 date: 2011-03-23
 show_day: true
 thumbnail: "/images/d1dce9_d4bf86f4733642b0a843d436245f9a92.jpg"

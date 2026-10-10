@@ -1,0 +1,3 @@
+{{- $th := .Params.thumbnail -}}
+{{- if and (not $th) .Params.images }}{{ $th = (index .Params.images 0).src }}{{ end -}}
+{{- return $th -}}

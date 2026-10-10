@@ -1,17 +1,28 @@
 {{ define "main" }}
-<div class="page-head"><div class="wrap">
-  <p class="crumb"><a href="{{ "news/" | relURL }}">お知らせ</a></p>
-  <h1>{{ .Title }}</h1>
-  <p class="meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ if .Params.show_day }}{{ .Date.Format "2006年1月2日" }}{{ else }}{{ .Date.Format "2006年1月" }}{{ end }}</time></p>
-</div></div>
-<div class="wrap content-wrap">
-  <article class="prose">{{ .Content }}
-    {{ with .Params.link }}<p class="more-link"><a href="{{ partial "u.html" . }}"{{ if hasPrefix . "http" }} target="_blank" rel="noopener"{{ end }}>関連リンク →</a></p>{{ end }}
+{{ $th := partial "blog-thumb.html" . }}
+<div class="wrap b-layout b-layout-single">
+  <article class="b-main b-post">
+    <p class="crumb"><a href="{{ "news/" | relURL }}">お知らせ</a></p>
+    <div class="b-meta">{{ partial "blog-cats.html" . }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ if .Params.show_day }}{{ .Date.Format "2006.01.02" }}{{ else }}{{ .Date.Format "2006.01" }}{{ end }}</time></div>
+    <h1 class="b-post-title">{{ .Title }}</h1>
+    {{ with $th }}<figure class="b-eyecatch"><img src="{{ partial "u.html" . }}" alt=""></figure>{{ end }}
+    <div class="prose b-body">
+      {{ .Content }}
+      {{ with .Params.link }}<p class="more-link"><a href="{{ partial "u.html" . }}"{{ if hasPrefix . "http" }} target="_blank" rel="noopener"{{ end }}>関連リンク →</a></p>{{ end }}
+    </div>
+    {{ $imgs := .Params.images }}
+    {{ if and $imgs (or (gt (len $imgs) 1) .Params.thumbnail) }}{{ partial "gallery.html" $imgs }}{{ end }}
+    <div class="b-share">
+      <span>シェア</span>
+      <a href="https://x.com/intent/post?url={{ .Permalink | urlquery }}&text={{ .Title | urlquery }}" target="_blank" rel="noopener">X</a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ .Permalink | urlquery }}" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://social-plugins.line.me/lineit/share?url={{ .Permalink | urlquery }}" target="_blank" rel="noopener">LINE</a>
+    </div>
+    <nav class="b-adjacent">
+      {{ with .NextInSection }}<a class="prev" href="{{ .RelPermalink }}"><small>← 新しい記事</small>{{ .Title }}</a>{{ else }}<span></span>{{ end }}
+      {{ with .PrevInSection }}<a class="next" href="{{ .RelPermalink }}"><small>古い記事 →</small>{{ .Title }}</a>{{ end }}
+    </nav>
   </article>
-  {{ partial "gallery.html" .Params.images }}
-  <nav class="pager">
-    {{ with .NextInSection }}<a href="{{ .RelPermalink }}">← {{ .Title | truncate 30 }}</a>{{ else }}<span></span>{{ end }}
-    {{ with .PrevInSection }}<a href="{{ .RelPermalink }}">{{ .Title | truncate 30 }} →</a>{{ end }}
-  </nav>
+  {{ partial "blog-sidebar.html" . }}
 </div>
 {{ end }}

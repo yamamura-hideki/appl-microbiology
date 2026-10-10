@@ -1,5 +1,6 @@
 ---
 title: "第34回日本放線菌学会大会（北海道大学）で修士2年生の岩渕君がポスター賞を受賞"
+categories: ["受賞", "学会発表"]
 date: 2019-09-24
 images:
   - src: "/images/d1dce9_afaaa3f9c1414b0aa0a6feed8f782ba8.jpg"

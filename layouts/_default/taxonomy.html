@@ -1,0 +1,7 @@
+{{ define "main" }}
+<div class="page-head"><div class="wrap"><p class="crumb"><a href="{{ "news/" | relURL }}">お知らせ</a></p><h1>カテゴリー一覧</h1></div></div>
+<div class="wrap b-layout">
+  <div class="b-main"><ul class="b-terms b-terms-big">{{ range .Data.Terms.ByCount }}<li><a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a><span>{{ .Count }}</span></li>{{ end }}</ul></div>
+  {{ partial "blog-sidebar.html" . }}
+</div>
+{{ end }}

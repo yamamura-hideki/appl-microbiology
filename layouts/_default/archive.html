@@ -1,0 +1,33 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+{{ $news := where site.RegularPages "Section" "news" }}
+<div class="wrap b-layout">
+  <div class="b-main">
+    <form class="b-search b-search-big" role="search" onsubmit="return false">
+      <input id="arch-q" type="search" placeholder="タイトル・本文で絞り込み" aria-label="記事を検索">
+    </form>
+    <p id="arch-none" class="note" hidden>該当する記事はありません。キーワードを変えてお試しください。</p>
+    {{ range $news.GroupByDate "2006" }}
+    <section class="arch-year" id="y{{ .Key }}">
+      <h2 class="year">{{ .Key }}年</h2>
+      <ul class="arch-list">
+        {{ range .Pages }}<li data-q="{{ .Title }} {{ .Plain | truncate 300 }} {{ range .GetTerms "categories" }}{{ .LinkTitle }} {{ end }}"><time>{{ .Date.Format "01.02" }}</time><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ partial "blog-cats.html" . }}</li>{{ end }}
+      </ul>
+    </section>
+    {{ end }}
+  </div>
+  {{ partial "blog-sidebar.html" . }}
+</div>
+<script>
+(function(){
+  var q=document.getElementById('arch-q'),none=document.getElementById('arch-none');
+  function run(){var v=q.value.trim().toLowerCase(),hit=0;
+    document.querySelectorAll('.arch-year').forEach(function(sec){var n=0;
+      sec.querySelectorAll('li').forEach(function(li){var ok=!v||li.dataset.q.toLowerCase().indexOf(v)>-1;li.hidden=!ok;if(ok)n++;});
+      sec.hidden=n===0;hit+=n;});
+    none.hidden=hit>0;}
+  var p=new URLSearchParams(location.search).get('q');if(p){q.value=p;}
+  q.addEventListener('input',run);run();
+})();
+</script>
+{{ end }}
