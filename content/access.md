@@ -2,7 +2,7 @@
 title: アクセス・お問い合わせ
 lead: COME ON IN — WE ARE OPEN FOR VISITORS
 form_url: https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=7Gm5RiY5jUSF0PpSow_aaCNwxUr--yFDkz8gA0UUnVlUNUYyQlpWNzVXVVQ1SEcwNVpWNlhZS1kzVS4u
-form_note: ''
+form_note: お問い合わせはこちらのリンクからお願いします。
 images: []
 ---
 
