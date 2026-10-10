@@ -1,6 +1,9 @@
 ---
-title: "アクセス・お問い合わせ"
-lead: "COME ON IN — WE ARE OPEN FOR VISITORS"
+title: アクセス・お問い合わせ
+lead: COME ON IN — WE ARE OPEN FOR VISITORS
+form_url: ''
+form_note: ''
+images: []
 ---
 
 ## 所在地
@@ -20,4 +23,4 @@ lead: "COME ON IN — WE ARE OPEN FOR VISITORS"
 
 研究室の見学・共同研究などのお問い合わせは、上記住所または大学の研究者総覧に掲載の連絡先までお寄せください。
 
-![](/images/d1dce9_3502ad5eeb804c34a4a650ad8e6aca90.jpg)
+[![](/images/d1dce9_3502ad5eeb804c34a4a650ad8e6aca90.jpg)](https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=7Gm5RiY5jUSF0PpSow_aaCNwxUr--yFDkz8gA0UUnVlUNUYyQlpWNzVXVVQ1SEcwNVpWNlhZS1kzVS4u)
