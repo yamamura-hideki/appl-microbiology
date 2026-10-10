@@ -1,9 +1,5 @@
-# 外部リンク（管理画面の「メンバー・アルバム・論文」→「外部リンク」から編集できます）
-# Instagram のURL（空欄なら非表示）
-instagram: ""
-# トップページのボタン下に出すフロウティラのURL（空欄なら非表示）
-flotilla: "https://flotilla.yamanashi.ac.jp/"
-# フッターに並べるリンク
+instagram: https://www.instagram.com/yamamura.ken.1lab/
+flotilla: https://flotilla.yamanashi.ac.jp/
 links:
-  - label: "山梨大学大村記念 微生物資源研究フロウティラ"
-    url: "https://flotilla.yamanashi.ac.jp/"
+  - label: 山梨大学大村記念 微生物資源研究フロウティラ
+    url: https://flotilla.yamanashi.ac.jp/
