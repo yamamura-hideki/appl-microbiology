@@ -1,6 +1,6 @@
 # 応用微生物学研究室 ホームページ
 
-山梨大学 応用微生物学研究室（山村研究室）のホームページです。
+山梨大学 応用微生物学研究室のホームページです。
 [Hugo](https://gohugo.io/) で作った静的サイトで、GitHub Pages で公開します。
 更新はブラウザの管理画面（[Sveltia CMS](https://github.com/sveltia/sveltia-cms)）から行えます。
 
