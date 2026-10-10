@@ -1,0 +1,7 @@
+<div class="page-head">
+  <div class="wrap">
+    {{ with .Parent }}{{ if not .IsHome }}<p class="crumb"><a href="{{ .RelPermalink }}">{{ .Title }}</a></p>{{ end }}{{ end }}
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.lead }}<p class="lead">{{ . }}</p>{{ end }}
+  </div>
+</div>

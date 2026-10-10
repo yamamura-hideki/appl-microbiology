@@ -1,0 +1,7 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap content-wrap">
+  {{ with .Content }}<div class="prose">{{ . }}</div>{{ end }}
+  {{ partial "gallery.html" site.Data.album.photos }}
+</div>
+{{ end }}

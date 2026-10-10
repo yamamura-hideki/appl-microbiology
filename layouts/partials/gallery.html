@@ -1,0 +1,12 @@
+{{- with . -}}
+<div class="gallery">
+{{- range . }}
+  {{- $src := . -}}{{- $cap := "" -}}
+  {{- if reflect.IsMap . }}{{ $src = .src }}{{ $cap = .caption | default "" }}{{ end -}}
+  <figure>
+    <a href="{{ partial "u.html" $src }}" class="lightbox" data-caption="{{ $cap }}"><img src="{{ partial "u.html" $src }}" alt="{{ $cap }}" loading="lazy"></a>
+    {{ with $cap }}<figcaption>{{ . }}</figcaption>{{ end }}
+  </figure>
+{{- end }}
+</div>
+{{- end -}}

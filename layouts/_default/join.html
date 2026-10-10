@@ -1,0 +1,12 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap content-wrap">
+  {{ with .Params.year }}
+  <h2 class="sec-title">研究室の1年</h2>
+  <ol class="year-line year-line-page">
+    {{ range . }}<li><span class="ym">{{ .month }}</span><span>{{ .event }}</span></li>{{ end }}
+  </ol>
+  {{ end }}
+  <article class="prose">{{ .Content }}</article>
+</div>
+{{ end }}

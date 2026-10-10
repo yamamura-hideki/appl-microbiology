@@ -1,0 +1,13 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap content-wrap">
+  {{ with .Params.hero }}<img class="hero-img" src="{{ partial "u.html" . }}" alt="">{{ end }}
+  <article class="prose">{{ .Content }}</article>
+  {{ partial "gallery.html" .Params.images }}
+  {{ with .Params.related }}
+  <div class="cards">
+    {{ range . }}<a class="card" href="{{ partial "u.html" .url }}">{{ with .image }}<img src="{{ partial "u.html" . }}" alt="" loading="lazy">{{ end }}<span>{{ .title }}</span></a>{{ end }}
+  </div>
+  {{ end }}
+</div>
+{{ end }}

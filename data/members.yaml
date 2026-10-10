@@ -1,0 +1,33 @@
+# メンバー一覧（管理画面の「メンバー」から編集できます）
+staff:
+  - name: "山村 英樹"
+    name_en: "Hideki Yamamura"
+    position: "准教授"
+    fields: ["微生物分類学", "放線菌探索学"]
+    photo: "/images/d1dce9_d3986696d3a64deb96369bc0923920de.jpg"
+    url: "https://eradb-ref.yamanashi.ac.jp/html/100007914_ja.html"
+  - name: "中川 洋史"
+    name_en: "Youji Nakagawa"
+    position: "准教授"
+    fields: ["ゲノム工学", "育種学", "スクリーニング学"]
+    photo: "/images/d1dce9_e06ce1efb96b49c9ba145ee82d73d277.jpg"
+    url: "https://eradb-ref.yamanashi.ac.jp/html/100007912_ja.html"
+  - name: "小久保 晋"
+    name_en: "Susumu Kokubo"
+    position: ""
+    fields: ["天然物化学", "化合物構造解析学"]
+    photo: "/images/d1dce9_31154d80a106414f8beea48e51223d84.jpg"
+    url: "https://eradb-ref.yamanashi.ac.jp/html/100007908_ja.html"
+  - name: "武 晃"
+    name_en: ""
+    position: ""
+    fields: ["応用微生物学", "臨床微生物学"]
+    photo: "/images/d1dce9_d9b7e794633742c280cbb983e6b49924.jpg"
+    url: ""
+students:
+  - grade: "修士2年"
+    names: ["伊藤 凌輔", "日下部 駿", "齊藤 康平", "竹村 勇紀", "町田 学"]
+  - grade: "修士1年"
+    names: ["大園 岳暉", "小林 春菜", "松田 俊輔", "三枝 雅"]
+  - grade: "4年生"
+    names: ["高比良 拓", "中西 海翔", "西 七映", "松本 有紗", "村越 紬", "矢澤 乃莉子"]

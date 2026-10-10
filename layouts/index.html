@@ -1,0 +1,123 @@
+{{ define "main" }}
+{{ $p := .Params }}
+
+<!-- ① ヒーロー：研究室の一言 ＋ レコードジャケット -->
+<section class="cp-hero">
+  <div class="wrap cp-hero-inner">
+    <div class="cp-hero-text">
+      <p class="cp-eyebrow">{{ site.Params.subtitle }}</p>
+      <p class="cp-wordmark">Applied Microbiology Lab.</p>
+      <h1 class="cp-catch">{{ range split ($p.catch | default site.Title) "\n" }}<span>{{ . }}</span>{{ end }}</h1>
+      <p class="cp-lead">{{ $p.lead | default site.Params.description }}</p>
+      <div class="cp-actions">
+        <a class="btn btn-primary" href="{{ "research/" | relURL }}">研究内容を見る</a>
+        <a class="btn btn-ghost" href="{{ partial "u.html" ($p.join_url | default "join/") }}">配属・進学を考えている方へ</a>
+      </div>
+    </div>
+    {{ partial "hero-sleeve.html" . }}
+  </div>
+</section>
+
+<!-- ② 研究テーマ：裏ジャケットの曲目リスト -->
+{{ with $p.tracks }}
+<section class="cp-tracks">
+  <div class="wrap">
+    <header class="cp-sec-head">
+      <p class="cp-kicker">Research</p>
+      <h2>研究テーマ</h2>
+    </header>
+    <ol class="tracklist">
+      {{ range . }}
+      <li>
+        <a href="{{ partial "u.html" .url }}">
+          <span class="tr-side">{{ .side }}</span>
+          {{ with .image }}<img src="{{ partial "u.html" . }}" alt="" loading="lazy">{{ end }}
+          <span class="tr-body"><strong>{{ .title }}</strong><span>{{ .text }}</span></span>
+          <span class="tr-arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      {{ end }}
+    </ol>
+  </div>
+</section>
+{{ end }}
+
+<!-- ③ 研究室の数字 -->
+{{ with $p.facts }}
+<section class="cp-facts">
+  <div class="wrap facts-grid">
+    {{ range . }}<div class="fact"><span class="fact-v">{{ .value }}</span><span class="fact-l">{{ .label }}</span></div>{{ end }}
+  </div>
+</section>
+{{ end }}
+
+<!-- ④ お知らせ ＋ 最近の成果 -->
+<section class="cp-news">
+  <div class="wrap news-grid">
+    <div>
+      <header class="cp-sec-head"><p class="cp-kicker">News</p><h2>お知らせ</h2></header>
+      <ul class="cp-news-list">
+        {{ range first ($p.news_count | default 6) (where site.RegularPages "Section" "news") }}
+        <li><a href="{{ .RelPermalink }}"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time><span>{{ .Title }}</span></a></li>
+        {{ end }}
+      </ul>
+      <p class="cp-more"><a href="{{ "news/" | relURL }}">お知らせをすべて見る →</a></p>
+    </div>
+    {{ with $p.highlights }}
+    <div>
+      <header class="cp-sec-head"><p class="cp-kicker">Highlights</p><h2>最近の成果</h2></header>
+      <div class="hl-list">
+        {{ range . }}
+        <a class="hl" href="{{ partial "u.html" .url }}"{{ if hasPrefix .url "http" }} target="_blank" rel="noopener"{{ end }}>
+          <span class="hl-tag">{{ .tag }}</span>
+          <strong>{{ .title | markdownify }}</strong>
+          <span>{{ .text }}</span>
+        </a>
+        {{ end }}
+      </div>
+    </div>
+    {{ end }}
+  </div>
+</section>
+
+<!-- ⑤ 配属・進学を考えている学生へ -->
+{{ $join := site.GetPage "/join" }}
+<section class="cp-join">
+  <div class="wrap join-grid">
+    <div>
+      <p class="cp-kicker cp-kicker-light">For students</p>
+      <h2>{{ $p.join_title }}</h2>
+      <p>{{ $p.join_text }}</p>
+      <a class="btn btn-light" href="{{ partial "u.html" ($p.join_url | default "join/") }}">配属・進学希望の方へ</a>
+    </div>
+    {{ with $join }}{{ with .Params.year }}
+    <ol class="year-line" aria-label="研究室の1年">
+      {{ range . }}<li><span class="ym">{{ .month }}</span><span>{{ .event }}</span></li>{{ end }}
+    </ol>
+    {{ end }}{{ end }}
+  </div>
+</section>
+
+<!-- ⑥ 企業・研究機関の方へ -->
+<section class="cp-collab">
+  <div class="wrap collab-inner">
+    <div>
+      <p class="cp-kicker">For partners</p>
+      <h2>{{ $p.collab_title }}</h2>
+      <p>{{ $p.collab_text }}</p>
+    </div>
+    <a class="btn btn-primary" href="{{ "access/" | relURL }}">お問い合わせ・アクセス</a>
+  </div>
+</section>
+
+<!-- ⑦ フォトストリップ -->
+{{ with site.Data.album.photos }}
+<section class="cp-strip" aria-label="研究室の写真">
+  <div class="strip-track">
+    {{ $ph := first 8 . }}
+    {{ range $ph }}<a href="{{ "lab/album/" | relURL }}"><img src="{{ partial "u.html" .src }}" alt="{{ .caption }}" loading="lazy"></a>{{ end }}
+    {{ range $ph }}<a href="{{ "lab/album/" | relURL }}" aria-hidden="true" tabindex="-1"><img src="{{ partial "u.html" .src }}" alt="" loading="lazy"></a>{{ end }}
+  </div>
+</section>
+{{ end }}
+{{ end }}

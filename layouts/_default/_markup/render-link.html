@@ -1,0 +1,2 @@
+{{- $d := .Destination -}}{{- $ext := or (hasPrefix $d "http") (hasPrefix $d "mailto:") -}}
+<a href="{{ if hasPrefix $d "/" }}{{ partial "u.html" $d }}{{ else }}{{ $d | safeURL }}{{ end }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if $ext }} target="_blank" rel="noopener"{{ end }}>{{ .Text | safeHTML }}</a>

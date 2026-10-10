@@ -1,0 +1,194 @@
+# 管理画面（Sveltia CMS）の設定
+# __REPO__ と __SITE_URL__ は公開時に GitHub Actions が自動で置き換えます。
+backend:
+  name: github
+  repo: __REPO__
+  branch: main
+  commit_messages:
+    create: "追加: {{collection}} 「{{slug}}」"
+    update: "更新: {{collection}} 「{{slug}}」"
+    delete: "削除: {{collection}} 「{{slug}}」"
+    uploadMedia: "画像追加: {{path}}"
+    deleteMedia: "画像削除: {{path}}"
+
+site_url: __SITE_URL__
+locale: ja
+media_folder: static/images/uploads
+public_folder: /images/uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  # ---------------- お知らせ ----------------
+  - name: news
+    label: お知らせ
+    label_singular: お知らせ
+    folder: content/news
+    create: true
+    slug: "{{year}}-{{month}}{{day}}-{{hour}}{{minute}}"
+    sortable_fields: [date, title]
+    summary: "{{date | date('YYYY-MM-DD')}}　{{title}}"
+    fields:
+      - { name: title, label: タイトル, widget: string }
+      - { name: date, label: 日付, widget: datetime, format: "YYYY-MM-DD", time_format: false, date_format: "YYYY-MM-DD" }
+      - { name: show_day, label: "日付を「日」まで表示する", widget: boolean, default: false, required: false }
+      - { name: thumbnail, label: "サムネイル画像（一覧用・省略可）", widget: image, required: false }
+      - { name: link, label: "関連リンク（URL・省略可）", widget: string, required: false }
+      - name: images
+        label: 写真ギャラリー
+        widget: list
+        required: false
+        fields:
+          - { name: src, label: 画像, widget: image }
+          - { name: caption, label: キャプション, widget: string, required: false }
+      - { name: body, label: 本文, widget: markdown, required: false }
+
+  # ---------------- メンバー・アルバム・論文（データ） ----------------
+  - name: data
+    label: メンバー・アルバム・論文
+    files:
+      - name: members
+        label: メンバー
+        file: data/members.yaml
+        fields:
+          - name: staff
+            label: スタッフ
+            widget: list
+            summary: "{{name}}"
+            fields:
+              - { name: name, label: 氏名, widget: string }
+              - { name: name_en, label: 氏名（英語）, widget: string, required: false }
+              - { name: position, label: 職名, widget: string, required: false }
+              - { name: fields, label: 専門分野, widget: list, required: false }
+              - { name: photo, label: 写真, widget: image, required: false }
+              - { name: url, label: 研究者情報URL, widget: string, required: false }
+          - name: students
+            label: 学生
+            widget: list
+            summary: "{{grade}}"
+            fields:
+              - { name: grade, label: 学年, widget: string }
+              - { name: names, label: 氏名, widget: list }
+      - name: album
+        label: アルバム
+        file: data/album.yaml
+        fields:
+          - name: photos
+            label: 写真
+            widget: list
+            summary: "{{caption}}"
+            fields:
+              - { name: src, label: 画像, widget: image }
+              - { name: caption, label: キャプション, widget: string, required: false }
+      - name: papers
+        label: 論文・業績
+        file: data/papers.yaml
+        fields:
+          - name: profiles
+            label: 教員の業績リンク
+            widget: list
+            summary: "{{name}}"
+            fields:
+              - { name: name, label: 氏名, widget: string }
+              - { name: label, label: 説明, widget: string, required: false }
+              - { name: url, label: URL, widget: string }
+          - name: publications
+            label: 主な論文
+            widget: list
+            required: false
+            summary: "{{year}} {{citation}}"
+            fields:
+              - { name: year, label: 年, widget: number, value_type: int }
+              - { name: citation, label: "書誌情報（*斜体* が使えます）", widget: text }
+              - { name: url, label: "URL（DOI・PubMedなど）", widget: string, required: false }
+
+  # ---------------- 固定ページ ----------------
+  - name: pages
+    label: 固定ページ
+    files:
+      - name: home
+        label: トップページ
+        file: content/_index.md
+        fields:
+          - { name: title, label: サイト名, widget: string }
+          - { name: catch, label: "キャッチコピー（改行で2行に）", widget: text }
+          - { name: lead, label: 紹介文, widget: text }
+          - { name: news_count, label: トップに表示するお知らせの件数, widget: number, value_type: int, default: 6 }
+          - name: tracks
+            label: 研究テーマ（曲目リスト）
+            widget: list
+            summary: "{{side}} {{title}}"
+            fields:
+              - { name: side, label: "番号（A1, A2, B1…）", widget: string }
+              - { name: title, label: テーマ名, widget: string }
+              - { name: text, label: 説明, widget: text }
+              - { name: url, label: リンク先, widget: string }
+              - { name: image, label: 画像, widget: image }
+          - name: facts
+            label: 研究室の数字
+            widget: list
+            summary: "{{value}} {{label}}"
+            fields:
+              - { name: value, label: 数字, widget: string }
+              - { name: label, label: 説明, widget: string }
+          - name: highlights
+            label: 最近の成果
+            widget: list
+            summary: "{{tag}} {{title}}"
+            fields:
+              - { name: tag, label: "ラベル（新種提案・論文など）", widget: string }
+              - { name: title, label: 見出し, widget: string }
+              - { name: text, label: 説明, widget: string }
+              - { name: url, label: リンク先, widget: string }
+          - { name: join_title, label: "学生向け欄：見出し", widget: string }
+          - { name: join_text, label: "学生向け欄：本文", widget: text }
+          - { name: join_url, label: "学生向け欄：リンク先", widget: string, default: "/join/" }
+          - { name: collab_title, label: "企業・研究機関向け欄：見出し", widget: string }
+          - { name: collab_text, label: "企業・研究機関向け欄：本文", widget: text }
+      - name: join
+        label: 配属・進学を考えている方へ
+        file: content/join.md
+        fields:
+          - { name: title, label: タイトル, widget: string }
+          - { name: lead, label: リード文, widget: string, required: false }
+          - { name: layout, label: レイアウト, widget: hidden, default: join }
+          - name: year
+            label: 研究室の1年
+            widget: list
+            summary: "{{month}} {{event}}"
+            fields:
+              - { name: month, label: 月, widget: string }
+              - { name: event, label: 出来事, widget: string }
+          - { name: body, label: 本文, widget: markdown }
+      - name: lab
+        label: 研究室の概要
+        file: content/lab/_index.md
+        fields: &page_fields
+          - { name: title, label: タイトル, widget: string }
+          - { name: lead, label: リード文, widget: string, required: false }
+          - { name: body, label: 本文, widget: markdown }
+          - name: images
+            label: 写真ギャラリー
+            widget: list
+            required: false
+            fields:
+              - { name: src, label: 画像, widget: image }
+              - { name: caption, label: キャプション, widget: string, required: false }
+          - name: related
+            label: リンクカード
+            widget: list
+            required: false
+            summary: "{{title}}"
+            fields:
+              - { name: title, label: 見出し, widget: string }
+              - { name: url, label: リンク先, widget: string }
+              - { name: image, label: 画像, widget: image, required: false }
+      - { name: exhibition, label: 展示スペース, file: content/lab/exhibition.md, fields: *page_fields }
+      - { name: research, label: 研究紹介, file: content/research/_index.md, fields: *page_fields }
+      - { name: isolation, label: 放線菌に関する研究, file: content/research/isolation.md, fields: *page_fields }
+      - { name: isolation_media, label: 放線菌の新分離培地, file: content/research/isolation-media.md, fields: *page_fields }
+      - { name: motile, label: 運動性放線菌, file: content/research/motile-actinomycetes.md, fields: *page_fields }
+      - { name: yeast, label: 酵母, file: content/research/yeast.md, fields: *page_fields }
+      - { name: access, label: アクセス・お問い合わせ, file: content/access.md, fields: *page_fields }

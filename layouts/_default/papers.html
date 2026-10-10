@@ -1,0 +1,18 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap content-wrap">
+  {{ with .Content }}<div class="prose">{{ . }}</div>{{ end }}
+  <h2 class="sec-title">教員の業績リスト</h2>
+  <div class="cards">
+  {{ range site.Data.papers.profiles }}<a class="card text" href="{{ .url }}" target="_blank" rel="noopener"><span>{{ .name }}<small>{{ .label }}</small></span></a>{{ end }}
+  </div>
+  {{ with site.Data.papers.publications }}
+  <h2 class="sec-title">主な論文</h2>
+  <ol class="pubs" reversed>
+    {{ range sort . "year" "desc" }}
+    <li><span class="yr">{{ .year }}</span> {{ .citation | markdownify }}{{ with .url }} <a href="{{ . }}" target="_blank" rel="noopener">[Link]</a>{{ end }}</li>
+    {{ end }}
+  </ol>
+  {{ end }}
+</div>
+{{ end }}

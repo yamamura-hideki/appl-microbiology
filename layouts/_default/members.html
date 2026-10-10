@@ -1,0 +1,27 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap content-wrap">
+  {{ with .Content }}<div class="prose">{{ . }}</div>{{ end }}
+  <h2 class="sec-title">スタッフ</h2>
+  <div class="staff">
+  {{ range site.Data.members.staff }}
+    <div class="staff-card">
+      <div class="staff-photo">{{ with .photo }}<img src="{{ partial "u.html" . }}" alt="" loading="lazy">{{ end }}</div>
+      <div>
+        {{ with .position }}<p class="pos">{{ . }}</p>{{ end }}
+        <h3>{{ .name }}{{ with .name_en }} <small>{{ . }}</small>{{ end }}</h3>
+        {{ with .fields }}<p class="fields">{{ delimit . " ／ " }}</p>{{ end }}
+        {{ with .url }}<p><a href="{{ . }}" target="_blank" rel="noopener">研究者情報 →</a></p>{{ end }}
+      </div>
+    </div>
+  {{ end }}
+  </div>
+  <h2 class="sec-title">学生</h2>
+  <div class="students">
+  {{ range site.Data.members.students }}
+    <div class="grade"><h3>{{ .grade }}</h3><ul>{{ range .names }}<li>{{ . }}</li>{{ end }}</ul></div>
+  {{ end }}
+  </div>
+  {{ with site.Data.members.alumni_note }}<p class="note">{{ . }}</p>{{ end }}
+</div>
+{{ end }}

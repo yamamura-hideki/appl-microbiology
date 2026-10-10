@@ -1,0 +1,10 @@
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div>
+      <p class="f-title">{{ site.Title }}</p>
+      <p>{{ site.Params.address }}</p>
+      {{ with site.Params.email }}<p><a href="mailto:{{ . }}">{{ . }}</a></p>{{ end }}
+    </div>
+    <p class="copy">© {{ now.Year }} 山梨大学 応用微生物学研究室</p>
+  </div>
+</footer>

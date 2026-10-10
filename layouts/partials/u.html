@@ -1,0 +1,3 @@
+{{- /* 画像やリンクのパスをサイトのベースURLに合わせて変換 */ -}}
+{{- $s := . -}}
+{{- if or (hasPrefix $s "http://") (hasPrefix $s "https://") (hasPrefix $s "mailto:") -}}{{ $s }}{{- else -}}{{ strings.TrimPrefix "/" $s | relURL }}{{- end -}}

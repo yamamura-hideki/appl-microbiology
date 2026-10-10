@@ -1,0 +1,76 @@
+{{/* レコードジャケット風ヒーロー：夕日＝シャーレ、富士山、湖面の反射 */}}
+<div class="sleeve-stage" aria-hidden="true">
+  <div class="disc"><div class="disc-label"><img src="{{ "images/logo.png" | relURL }}" alt=""></div></div>
+  <div class="sleeve">
+    <svg class="sleeve-art" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid slice" role="img">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1F2152"/>
+          <stop offset=".45" stop-color="#7A3F86"/>
+          <stop offset=".72" stop-color="#FF5F8F"/>
+          <stop offset=".8" stop-color="#FFB23F"/>
+        </linearGradient>
+        <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#FFE38A"/>
+          <stop offset=".55" stop-color="#FFB23F"/>
+          <stop offset="1" stop-color="#FF5F8F"/>
+        </linearGradient>
+        <linearGradient id="lake" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0F8FA8"/>
+          <stop offset="1" stop-color="#1F2152"/>
+        </linearGradient>
+        <mask id="stripes">
+          <rect width="600" height="600" fill="#fff"/>
+          <rect y="372" width="600" height="5" fill="#000"/>
+          <rect y="392" width="600" height="8" fill="#000"/>
+          <rect y="413" width="600" height="11" fill="#000"/>
+          <rect y="437" width="600" height="14" fill="#000"/>
+          <rect y="462" width="600" height="18" fill="#000"/>
+        </mask>
+      </defs>
+      <rect width="600" height="600" fill="url(#sky)"/>
+      <!-- 星 -->
+      <g fill="#fff" opacity=".7">
+        <circle cx="70" cy="60" r="1.6"/><circle cx="150" cy="120" r="1.1"/><circle cx="520" cy="80" r="1.8"/>
+        <circle cx="450" cy="150" r="1"/><circle cx="260" cy="40" r="1.2"/><circle cx="560" cy="200" r="1.1"/>
+      </g>
+      <!-- 太陽＝シャーレ -->
+      <g mask="url(#stripes)" class="sun">
+        <circle cx="300" cy="330" r="172" fill="url(#sun)"/>
+        <circle cx="300" cy="330" r="164" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="5"/>
+        <circle cx="306" cy="324" r="172" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2"/>
+        <!-- コロニー（放線菌の集落） -->
+        <g class="colonies">
+          <g><circle cx="230" cy="250" r="16" fill="#FFF6E0"/><circle cx="230" cy="250" r="22" fill="none" stroke="#FFF6E0" stroke-width="3" stroke-dasharray="1.5 3"/></g>
+          <g><circle cx="330" cy="215" r="10" fill="#fff"/><circle cx="330" cy="215" r="15" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="1.5 3"/></g>
+          <g><circle cx="385" cy="285" r="20" fill="#FFF0F5"/><circle cx="385" cy="285" r="27" fill="none" stroke="#FFF0F5" stroke-width="3" stroke-dasharray="1.5 3"/><circle cx="385" cy="285" r="7" fill="#FFB23F"/></g>
+          <g><circle cx="270" cy="330" r="9" fill="#fff"/><circle cx="270" cy="330" r="13" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="1.5 3"/></g>
+          <g><circle cx="190" cy="335" r="7" fill="#FFF6E0"/></g>
+          <g><circle cx="420" cy="350" r="8" fill="#fff"/></g>
+          <g><circle cx="300" cy="275" r="5" fill="#fff"/></g>
+        </g>
+      </g>
+      <!-- 富士山 -->
+      <path d="M-10 486 C110 450 200 380 268 318 L332 318 C400 380 490 450 610 486 Z" fill="#5B3E8E"/>
+      <path d="M268 318 L332 318 L360 344 L346 338 L334 350 L320 340 L306 352 L292 340 L278 350 L266 338 L240 346 Z" fill="#fff"/>
+      <path d="M-10 486 C80 468 150 452 210 440 C150 470 70 482 -10 492 Z" fill="#3F2A6E" opacity=".7"/>
+      <!-- 湖面 -->
+      <rect y="486" width="600" height="114" fill="url(#lake)"/>
+      <g class="shimmer">
+        <rect x="200" y="496" width="200" height="5" rx="2.5" fill="#FFB23F"/>
+        <rect x="222" y="510" width="156" height="4" rx="2" fill="#FF8C6A"/>
+        <rect x="246" y="523" width="108" height="4" rx="2" fill="#FF5F8F"/>
+        <rect x="266" y="536" width="68" height="3" rx="1.5" fill="#FF5F8F"/>
+        <rect x="282" y="548" width="36" height="3" rx="1.5" fill="#FF5F8F" opacity=".8"/>
+      </g>
+      <!-- ジャケットの文字 -->
+      <text x="586" y="40" text-anchor="end" class="sleeve-side">SIDE A</text>
+      <text x="586" y="584" text-anchor="end" class="sleeve-wordmark">Applied Microbiology</text>
+    </svg>
+    <div class="obi">
+      <span class="obi-col"><span class="obi-small">山梨大学</span><span class="obi-title">応用微生物学研究室</span></span>
+      <span class="obi-copy">{{ replace (.Params.catch | default "") "\n" "" }}</span>
+      <span class="obi-mark">KOFU</span>
+    </div>
+  </div>
+</div>

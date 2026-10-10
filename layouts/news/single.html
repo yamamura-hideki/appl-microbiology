@@ -1,0 +1,17 @@
+{{ define "main" }}
+<div class="page-head"><div class="wrap">
+  <p class="crumb"><a href="{{ "news/" | relURL }}">お知らせ</a></p>
+  <h1>{{ .Title }}</h1>
+  <p class="meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ if .Params.show_day }}{{ .Date.Format "2006年1月2日" }}{{ else }}{{ .Date.Format "2006年1月" }}{{ end }}</time></p>
+</div></div>
+<div class="wrap content-wrap">
+  <article class="prose">{{ .Content }}
+    {{ with .Params.link }}<p class="more-link"><a href="{{ partial "u.html" . }}"{{ if hasPrefix . "http" }} target="_blank" rel="noopener"{{ end }}>関連リンク →</a></p>{{ end }}
+  </article>
+  {{ partial "gallery.html" .Params.images }}
+  <nav class="pager">
+    {{ with .NextInSection }}<a href="{{ .RelPermalink }}">← {{ .Title | truncate 30 }}</a>{{ else }}<span></span>{{ end }}
+    {{ with .PrevInSection }}<a href="{{ .RelPermalink }}">{{ .Title | truncate 30 }} →</a>{{ end }}
+  </nav>
+</div>
+{{ end }}

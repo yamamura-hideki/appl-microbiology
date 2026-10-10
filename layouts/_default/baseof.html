@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ if .IsHome }}{{ site.Title }} | {{ site.Params.subtitle }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with .Summary }}{{ . | plainify | truncate 120 }}{{ else }}{{ site.Params.description }}{{ end }}{{ end }}">
+  <meta property="og:title" content="{{ .Title }}">
+  <meta property="og:site_name" content="{{ site.Title }}">
+  <link rel="icon" href="{{ "images/logo.png" | relURL }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shrikhand&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  {{ $css := slice (resources.Get "css/main.css") (resources.Get "css/citypop.css") | resources.Concat "css/site.css" | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}">
+  {{ with .OutputFormats.Get "rss" }}<link rel="alternate" type="application/rss+xml" href="{{ .RelPermalink }}" title="{{ site.Title }}">{{ end }}
+</head>
+<body class="{{ if .IsHome }}is-home{{ end }}">
+  {{ partial "header.html" . }}
+  <main id="main">{{ block "main" . }}{{ end }}</main>
+  {{ partial "footer.html" . }}
+  <div id="lb" class="lb" hidden><button class="lb-close" aria-label="閉じる">×</button><img alt=""><p></p></div>
+  <script>
+  (function(){
+    var t=document.querySelector('.nav-toggle'),n=document.querySelector('.site-nav');
+    if(t){t.addEventListener('click',function(){var o=n.classList.toggle('open');t.setAttribute('aria-expanded',o)})}
+    var lb=document.getElementById('lb'),im=lb.querySelector('img'),cp=lb.querySelector('p');
+    document.addEventListener('click',function(e){
+      var a=e.target.closest('a.lightbox');
+      if(a){e.preventDefault();im.src=a.href;cp.textContent=a.dataset.caption||'';lb.hidden=false;return}
+      if(!lb.hidden&&(e.target===lb||e.target.classList.contains('lb-close'))){lb.hidden=true;im.src=''}
+    });
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.hidden=true});
+  })();
+  </script>
+</body>
+</html>
