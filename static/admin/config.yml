@@ -191,4 +191,19 @@ collections:
       - { name: isolation_media, label: 放線菌の新分離培地, file: content/research/isolation-media.md, fields: *page_fields }
       - { name: motile, label: 運動性放線菌, file: content/research/motile-actinomycetes.md, fields: *page_fields }
       - { name: yeast, label: 酵母, file: content/research/yeast.md, fields: *page_fields }
-      - { name: access, label: アクセス・お問い合わせ, file: content/access.md, fields: *page_fields }
+      - name: access
+        label: アクセス・お問い合わせ
+        file: content/access.md
+        fields:
+          - { name: title, label: タイトル, widget: string }
+          - { name: lead, label: リード文, widget: string, required: false }
+          - { name: form_url, label: "お問い合わせフォームのURL（Microsoft Formsの共有URL。空欄ならフォーム非表示）", widget: string, required: false }
+          - { name: form_note, label: "フォームの上に表示する案内文", widget: text, required: false }
+          - { name: body, label: 本文, widget: markdown }
+          - name: images
+            label: 写真ギャラリー
+            widget: list
+            required: false
+            fields:
+              - { name: src, label: 画像, widget: image }
+              - { name: caption, label: キャプション, widget: string, required: false }

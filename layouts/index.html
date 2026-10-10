@@ -106,7 +106,7 @@
       <h2>{{ $p.collab_title }}</h2>
       <p>{{ $p.collab_text }}</p>
     </div>
-    <a class="btn btn-primary" href="{{ "access/" | relURL }}">お問い合わせ・アクセス</a>
+    <a class="btn btn-primary" href="{{ "access/" | relURL }}{{ with site.GetPage "/access" }}{{ if .Params.form_url }}#contact-form{{ end }}{{ end }}">お問い合わせ・アクセス</a>
   </div>
 </section>
 
