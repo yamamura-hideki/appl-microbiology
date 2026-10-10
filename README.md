@@ -10,7 +10,7 @@
 
 1. **GitHub アカウントを用意**します（研究室用のアカウントか Organization がおすすめです）。
 2. GitHub で **新しいリポジトリを作成**します。
-   - リポジトリ名の例: `appl-microbiology`（URL が `[https://<アカウント名>.github.io/appl-microbiology/](https://yamamura-hideki.github.io/appl-microbiology/)` になります）
+   - リポジトリ名の例: `appl-microbiology`（URL が [https://yamamura-hideki.github.io/appl-microbiology/](https://yamamura-hideki.github.io/appl-microbiology/) になります）
    - Public を選びます（無料プランの GitHub Pages は Public リポジトリが必要です）。
 3. このフォルダの中身を**すべてアップロード**します。
    - リポジトリ画面の「uploading an existing file」をクリックし、フォルダの中身（`.github` フォルダを含む）をドラッグ＆ドロップして「Commit changes」を押します。
