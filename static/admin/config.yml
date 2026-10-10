@@ -82,6 +82,20 @@ collections:
             fields:
               - { name: src, label: 画像, widget: image }
               - { name: caption, label: キャプション, widget: string, required: false }
+      - name: links
+        label: 外部リンク（Instagram・関連サイト）
+        file: data/links.yaml
+        fields:
+          - { name: instagram, label: "InstagramのURL（空欄なら非表示）", widget: string, required: false }
+          - { name: flotilla, label: "フロウティラのURL（トップページのボタン下に表示。空欄なら非表示）", widget: string, required: false }
+          - name: links
+            label: フッターに並べるリンク
+            widget: list
+            required: false
+            summary: "{{label}}"
+            fields:
+              - { name: label, label: 表示名, widget: string }
+              - { name: url, label: URL, widget: string }
       - name: papers
         label: 論文・業績
         file: data/papers.yaml
