@@ -12,6 +12,7 @@
       {{ range $L.links }}<li><a class="f-pill" href="{{ .url }}" target="_blank" rel="noopener">{{ .label }} ↗</a></li>{{ end }}
     </ul>
     {{ end }}
+    {{ with site.Data.analytics.ga_id }}<p class="copy f-ga">このサイトでは、利用状況の把握のために Google アナリティクスを使用しています（<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">データの取り扱い</a>）。</p>{{ end }}
     <p class="copy">© {{ now.Year }} 山梨大学 応用微生物学研究室</p>
   </div>
 </footer>

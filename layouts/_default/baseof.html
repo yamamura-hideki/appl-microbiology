@@ -17,6 +17,10 @@
   {{ $css := slice (resources.Get "css/main.css") (resources.Get "css/citypop.css") | resources.Concat "css/site.css" | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $css.RelPermalink }}">
   {{ with .OutputFormats.Get "rss" }}<link rel="alternate" type="application/rss+xml" href="{{ .RelPermalink }}" title="{{ site.Title }}">{{ end }}
+  {{- with site.Data.analytics.ga_id }}{{ if hugo.IsProduction }}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ . }}"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ . }}');</script>
+  {{- end }}{{ end }}
 </head>
 <body class="{{ if .IsHome }}is-home{{ end }}">
   {{ partial "header.html" . }}

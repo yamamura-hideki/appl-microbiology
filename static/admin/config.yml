@@ -97,6 +97,11 @@ collections:
             fields:
               - { name: label, label: 表示名, widget: string }
               - { name: url, label: URL, widget: string }
+      - name: analytics
+        label: アクセス解析（Google アナリティクス）
+        file: data/analytics.yaml
+        fields:
+          - { name: ga_id, label: "測定ID（G- で始まるID。空欄なら無効）", widget: string, required: false, pattern: ["^(G-[A-Z0-9]+)?$", "G- で始まる測定IDを入力してください"] }
       - name: papers
         label: 論文・業績
         file: data/papers.yaml
