@@ -1,0 +1,14 @@
+{
+  "name": "お知らせ投稿｜応用微生物学研究室",
+  "short_name": "お知らせ投稿",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#CDEFF7",
+  "theme_color": "#1F2152",
+  "icons": [
+    { "src": "../apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "../favicon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "../favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
