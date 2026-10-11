@@ -8,7 +8,7 @@
       <p class="cp-eyebrow">{{ site.Params.subtitle }}</p>
       <p class="cp-wordmark">Applied Microbiology Lab.</p>
       <h1 class="cp-catch">{{ range split ($p.catch | default site.Title) "\n" }}<span>{{ . }}</span>{{ end }}</h1>
-      <p class="cp-lead">{{ $p.lead | default site.Params.description }}</p>
+      <p class="cp-lead">{{ partial "br.html" ($p.lead | default site.Params.description) }}</p>
       <div class="cp-actions">
         <a class="btn btn-primary" href="{{ "research/" | relURL }}">研究内容を見る</a>
         <a class="btn btn-ghost" href="{{ partial "u.html" ($p.join_url | default "join/") }}">配属・進学を考えている方へ</a>
@@ -42,7 +42,7 @@
         <a href="{{ partial "u.html" .url }}">
           <span class="tr-side">{{ .side }}</span>
           {{ with .image }}<img src="{{ partial "u.html" . }}" alt="" loading="lazy">{{ end }}
-          <span class="tr-body"><strong>{{ .title }}</strong><span>{{ .text }}</span></span>
+          <span class="tr-body"><strong>{{ .title }}</strong><span>{{ partial "br.html" .text }}</span></span>
           <span class="tr-arrow" aria-hidden="true">→</span>
         </a>
       </li>
@@ -56,7 +56,7 @@
 {{ with $p.facts }}
 <section class="cp-facts">
   <div class="wrap facts-grid">
-    {{ range . }}<div class="fact"><span class="fact-v">{{ .value }}</span><span class="fact-l">{{ .label }}</span></div>{{ end }}
+    {{ range . }}<div class="fact"><span class="fact-v">{{ .value }}</span><span class="fact-l">{{ partial "br.html" .label }}</span></div>{{ end }}
   </div>
 </section>
 {{ end }}
@@ -81,7 +81,7 @@
         <a class="hl" href="{{ partial "u.html" .url }}"{{ if hasPrefix .url "http" }} target="_blank" rel="noopener"{{ end }}>
           <span class="hl-tag">{{ .tag }}</span>
           <strong>{{ .title | markdownify }}</strong>
-          <span>{{ .text }}</span>
+          <span>{{ partial "br.html" .text }}</span>
         </a>
         {{ end }}
       </div>
@@ -97,7 +97,7 @@
     <div>
       <p class="cp-kicker cp-kicker-light">For students</p>
       <h2>{{ $p.join_title }}</h2>
-      <p>{{ $p.join_text }}</p>
+      <p>{{ partial "br.html" $p.join_text }}</p>
       <a class="btn btn-light" href="{{ partial "u.html" ($p.join_url | default "join/") }}">配属・進学希望の方へ</a>
     </div>
     {{ with $join }}{{ with .Params.year }}
@@ -114,7 +114,7 @@
     <div>
       <p class="cp-kicker">For partners</p>
       <h2>{{ $p.collab_title }}</h2>
-      <p>{{ $p.collab_text }}</p>
+      <p>{{ partial "br.html" $p.collab_text }}</p>
     </div>
     <a class="btn btn-primary" href="{{ "access/" | relURL }}{{ with site.GetPage "/access" }}{{ if .Params.form_url }}#contact-form{{ end }}{{ end }}">お問い合わせ・アクセス</a>
   </div>

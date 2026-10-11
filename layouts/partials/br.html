@@ -1,0 +1,6 @@
+{{- /* 管理画面で入れた改行をそのまま表示（空行は段落の区切り） */ -}}
+{{- $s := . | default "" | string | htmlEscape -}}
+{{- $s = replaceRE `\r\n?` "\n" $s -}}
+{{- $s = replaceRE `\n{2,}` "<span class=\"para-gap\"></span>" $s -}}
+{{- $s = replace $s "\n" "<br>" -}}
+{{- $s | safeHTML -}}
