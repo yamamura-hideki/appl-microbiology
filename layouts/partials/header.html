@@ -6,13 +6,19 @@
     <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="メニュー"><span></span><span></span><span></span></button>
     <nav class="site-nav" id="site-nav">
       <ul>
-      {{- $cur := . }}
-      {{- range site.Menus.main }}
-        <li class="{{ if .HasChildren }}has-sub{{ end }}{{ if or ($cur.IsMenuCurrent "main" .) ($cur.HasMenuCurrent "main" .) }} active{{ end }}">
-          <a href="{{ .URL }}">{{ .Name }}</a>
-          {{- if .HasChildren }}
+      {{- $cur := .RelPermalink }}
+      {{- $home := "" | relURL }}
+      {{- range site.Data.menu.items }}
+        {{- $u := partial "u.html" (.url | default "/") }}
+        {{- $ext := hasPrefix .url "http" }}
+        {{- $active := eq $cur $u }}
+        {{- if and (not $active) (not $ext) (ne $u $home) (hasPrefix $cur $u) }}{{ $active = true }}{{ end }}
+        {{- range .children }}{{ if eq $cur (partial "u.html" (.url | default "/")) }}{{ $active = true }}{{ end }}{{ end }}
+        <li class="{{ if .children }}has-sub{{ end }}{{ if $active }} active{{ end }}">
+          <a href="{{ $u }}"{{ if $ext }} target="_blank" rel="noopener"{{ end }}>{{ .name }}</a>
+          {{- with .children }}
           <ul class="sub">
-            {{- range .Children }}<li><a href="{{ .URL }}">{{ .Name }}</a></li>{{ end }}
+            {{- range . }}{{ $cu := partial "u.html" (.url | default "/") }}<li><a href="{{ $cu }}"{{ if hasPrefix .url "http" }} target="_blank" rel="noopener"{{ end }}>{{ .name }}</a></li>{{ end }}
           </ul>
           {{- end }}
         </li>

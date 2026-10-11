@@ -46,6 +46,64 @@ collections:
           - { name: caption, label: キャプション, widget: string, required: false }
       - { name: body, label: 本文, widget: markdown, required: false }
 
+  # ---------------- 自由に追加できるページ ----------------
+  - name: free_pages
+    label: 追加ページ
+    label_singular: ページ
+    description: "新しいページを作れます。作ったら「サイト構成」→「メニュー（見出し）」にリンクを追加してください。ページのURLは /pages/URL名/ になります。"
+    folder: content/pages
+    create: true
+    slug: "{{fields.url_name}}"
+    identifier_field: title
+    summary: "{{title}}（/pages/{{url_name}}/）"
+    fields:
+      - { name: title, label: ページの見出し, widget: string }
+      - { name: url_name, label: "URL名（半角英数字とハイフン。例：equipment）", widget: string, pattern: ["^[a-z0-9-]+$", "半角の小文字英数字とハイフンだけで入力してください"] }
+      - { name: draft, label: 下書き（チェックすると公開しない）, widget: boolean, default: false, required: false }
+      - { name: lead, label: リード文, widget: string, required: false }
+      - { name: hero, label: ページ先頭の画像, widget: image, required: false }
+      - { name: body, label: 本文, widget: markdown }
+      - name: images
+        label: 写真ギャラリー
+        widget: list
+        required: false
+        fields:
+          - { name: src, label: 画像, widget: image }
+          - { name: caption, label: キャプション, widget: string, required: false }
+      - name: related
+        label: リンクカード
+        widget: list
+        required: false
+        summary: "{{title}}"
+        fields:
+          - { name: title, label: 見出し, widget: string }
+          - { name: url, label: リンク先, widget: string }
+          - { name: image, label: 画像, widget: image, required: false }
+
+  # ---------------- サイト構成 ----------------
+  - name: structure
+    label: サイト構成
+    files:
+      - name: menu
+        label: メニュー（見出し）
+        file: data/menu.yaml
+        fields:
+          - name: items
+            label: メニュー項目（上から順に左から並びます。ドラッグで並べ替え）
+            widget: list
+            summary: "{{name}}  →  {{url}}"
+            fields:
+              - { name: name, label: 見出しの文字, widget: string }
+              - { name: url, label: "リンク先（例：/lab/ 、/pages/equipment/ 、https://…）", widget: string }
+              - name: children
+                label: サブメニュー（マウスを乗せると出る項目。なしでも可）
+                widget: list
+                required: false
+                summary: "{{name}}  →  {{url}}"
+                fields:
+                  - { name: name, label: 見出しの文字, widget: string }
+                  - { name: url, label: リンク先, widget: string }
+
   # ---------------- メンバー・アルバム・論文（データ） ----------------
   - name: data
     label: メンバー・アルバム・論文

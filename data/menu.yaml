@@ -1,0 +1,28 @@
+# サイト上部のメニュー（管理画面の「サイト構成」→「メニュー（見出し）」から編集できます）
+# url はサイト内なら /lab/members/ のように「/」から書きます。外部サイトは https:// から。
+items:
+  - name: "HOME"
+    url: "/"
+  - name: "お知らせ"
+    url: "/news/"
+  - name: "研究室"
+    url: "/lab/"
+    children:
+      - { name: "研究室の概要", url: "/lab/" }
+      - { name: "メンバー", url: "/lab/members/" }
+      - { name: "展示スペース", url: "/lab/exhibition/" }
+      - { name: "アルバム", url: "/lab/album/" }
+  - name: "研究内容"
+    url: "/research/"
+    children:
+      - { name: "研究紹介", url: "/research/" }
+      - { name: "放線菌の分離", url: "/research/isolation/" }
+      - { name: "新分離培地", url: "/research/isolation-media/" }
+      - { name: "運動性放線菌", url: "/research/motile-actinomycetes/" }
+      - { name: "酵母", url: "/research/yeast/" }
+  - name: "配属希望の方へ"
+    url: "/join/"
+  - name: "論文"
+    url: "/papers/"
+  - name: "アクセス"
+    url: "/access/"
