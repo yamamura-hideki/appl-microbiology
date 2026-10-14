@@ -33,7 +33,21 @@
 
 /* sleeve */
 .sleeve-stage{position:relative;width:calc(100% - 56px);max-width:520px;justify-self:end;margin-right:56px}
-.sleeve{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(31,33,82,.55),0 0 0 1px rgba(31,33,82,.08);z-index:2;background:var(--navy)}
+.sleeve{position:relative;aspect-ratio:1;z-index:2;perspective:1800px;cursor:pointer}
+.sleeve-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.7,.2,1)}
+.face{position:absolute;inset:0;border-radius:6px;overflow:hidden;background:var(--navy);box-shadow:0 30px 60px -20px rgba(31,33,82,.55),0 0 0 1px rgba(31,33,82,.08);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face-b{transform:rotateY(180deg)}
+@media (hover:hover){.sleeve:hover .sleeve-inner{transform:rotateY(180deg)}}
+.sleeve.is-flipped .sleeve-inner{transform:rotateY(180deg)}
+.helix path{stroke-dasharray:6 7}
+.flip-hint{position:absolute;left:50%;bottom:-46px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--navy);border-radius:999px;padding:5px 14px;font:inherit;font-size:.78rem;color:var(--navy);cursor:pointer;white-space:nowrap;z-index:3}
+.flip-hint .fh-a,.flip-hint .fh-b{font-family:var(--f-mono);letter-spacing:.12em;font-weight:500}
+.flip-hint .fh-a{color:var(--pink)}
+.flip-hint .fh-sep{color:var(--muted)}
+.flip-hint .fh-txt{font-size:.72rem;color:var(--muted);border-left:1px solid var(--line);padding-left:8px}
+.sleeve-stage:has(.is-flipped) .fh-a,.sleeve-stage:hover .fh-a{color:var(--muted)}
+.sleeve-stage:has(.is-flipped) .fh-b{color:var(--lagoon)}
+@media (hover:hover){.sleeve-stage:has(.sleeve:hover) .fh-b{color:var(--lagoon)}}
 .sleeve-art{display:block;width:100%;height:100%}
 .sleeve-side{font-family:var(--f-mono);font-size:13px;fill:#fff;letter-spacing:3px;opacity:.8}
 .sleeve-wordmark{font-family:var(--f-script);font-size:30px;fill:#fff}
@@ -146,6 +160,7 @@
 }
 @media (prefers-reduced-motion:reduce){
   .disc,.disc-label,.shimmer rect,.strip-track{animation:none}
+  .sleeve-inner{transition:none}
   .disc{transform:translateX(16%)}
   .btn,.hl,.tr-arrow{transition:none}
 }
