@@ -1,7 +1,7 @@
 staff:
   - name: 山村 英樹
     name_en: Hideki Yamamura
-    position: 准教授
+    position: 教授
     fields:
       - 微生物分類学
       - 放線菌探索学
@@ -25,13 +25,13 @@ staff:
     photo: /images/d1dce9_31154d80a106414f8beea48e51223d84.jpg
     url: https://eradb-ref.yamanashi.ac.jp/html/100007908_ja.html
   - name: 武 晃
-    name_en: ''
-    position: ''
+    name_en: Akira Take
+    position: 助教
     fields:
       - 応用微生物学
       - 臨床微生物学
     photo: /images/d1dce9_d9b7e794633742c280cbb983e6b49924.jpg
-    url: ''
+    url: https://eradb-ref.yamanashi.ac.jp/html/100009108_ja.html
 students:
   - grade: 修士2年
     names:
