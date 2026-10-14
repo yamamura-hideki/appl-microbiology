@@ -1,16 +1,17 @@
-# 論文・業績（管理画面の「論文」から編集できます）
 profiles:
-  - name: "山村 英樹"
-    label: "Hideki Yamamura — Google Scholar"
-    url: "https://scholar.google.co.jp/citations?hl=ja&user=qfvtRvwAAAAJ"
-  - name: "中川 洋史"
-    label: "Youji Nakagawa — researchmap"
-    url: "https://researchmap.jp/read0054782/published_papers"
-  - name: "小久保 晋"
-    label: "Susumu Kokubo — 研究者総覧"
-    url: "https://eradb-ref.yamanashi.ac.jp/html/100007908_ja.html"
-# 主な論文（新しいものを追加してください。year の大きい順に表示されます）
+  - name: 山村 英樹
+    label: Hideki Yamamura — Google Scholar
+    url: https://scholar.google.co.jp/citations?hl=ja&user=qfvtRvwAAAAJ
+  - name: 中川 洋史
+    label: Youji Nakagawa — researchmap
+    url: https://researchmap.jp/read0054782/published_papers
+  - name: 小久保 晋
+    label: Susumu Kokubo — 研究者総覧
+    url: https://eradb-ref.yamanashi.ac.jp/html/100007908_ja.html
+  - name: 武 晃
+    label: Akira Take — researchmap
+    url: https://researchmap.jp/AkiraTake/published_papers
 publications:
-  - year: 2022
-    citation: "社会人博士課程 長沼さんの研究成果（PubMed 36564595）"
-    url: "https://pubmed.ncbi.nlm.nih.gov/36564595/"
+  - year: 2023
+    citation: 社会人博士課程 長沼さんの研究成果（PubMed 36564595）
+    url: https://pubmed.ncbi.nlm.nih.gov/36564595/
