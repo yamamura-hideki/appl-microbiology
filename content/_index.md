@@ -31,7 +31,7 @@ tracks:
     title: 薬の種を効率よく見つけるための酵母を開発する
     text: 酵母の遺伝子を改変して、放線菌から薬の種を効率よく見つけるための酵母を開発します。
     url: https://www.scrs.yamanashi.ac.jp/wp-content/uploads/2026/03/6346ab6c2f76029084254bdee8da225c.pdf
-    image: /images/uploads/pasted-image-1794881757076.png
+    image: /images/uploads/9ad7be55-b054-4fc3-886c-ced051b7172a.webp
 facts:
   - value: '1957'
     label: 発酵生産学科の創設とともに開講
