@@ -40,7 +40,7 @@
       {{ range . }}
       <li>
         <a href="{{ partial "u.html" .url }}">
-          <span class="tr-side">{{ .side }}</span>
+          <span class="tr-side tr-side-{{ substr (.side | default "A") 0 1 | lower }}">{{ .side }}</span>
           {{ with .image }}<img src="{{ partial "u.html" . }}" alt="" loading="lazy">{{ end }}
           <span class="tr-body"><strong>{{ .title }}</strong><span>{{ partial "br.html" .text }}</span></span>
           <span class="tr-arrow" aria-hidden="true">→</span>
