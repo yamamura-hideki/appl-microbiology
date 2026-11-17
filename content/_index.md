@@ -17,16 +17,21 @@ tracks:
     text: 遊走子が化学物質に引き寄せられる性質を利用した、運動性放線菌の高度選択分離法。
     url: /research/motile-actinomycetes/
     image: /images/d1dce9_1ee40103c65a488aa3a1d5bc44922733.jpg
-  - side: B1
+  - side: A3
     title: 新種を記載し、薬の種を探す
     text: DNA解析で分類し、新しい抗生物質や生理活性物質を生む株を見つけます。
     url: /research/
     image: /images/d1dce9_f74be2758f2b481bb6736dc6684e206a.jpg
   - side: B2
-    title: ストレスに強い“スーパー酵母”
-    text: ワインの産膜機構の解明や、マルチストレス耐性酵母の育種に取り組みます。
-    url: /research/yeast/
+    title: 酵母の新しい育種技術を開発する
+    text: 産業界で用いられる酵母をより高機能にするための育種方法の開発を行っています。
+    url: https://www.scrs.yamanashi.ac.jp/wp-content/uploads/2026/03/6346ab6c2f76029084254bdee8da225c.pdf
     image: /images/d1dce9_70b8ef08484841808647a30547b27c28.jpg
+  - side: B2
+    title: 薬の種を効率よく見つけるための酵母を開発する
+    text: 酵母の遺伝子を改変して、放線菌から薬の種を効率よく見つけるための酵母を開発します。
+    url: https://www.scrs.yamanashi.ac.jp/wp-content/uploads/2026/03/6346ab6c2f76029084254bdee8da225c.pdf
+    image: /images/uploads/pasted-image-1794881757076.png
 facts:
   - value: '1957'
     label: 発酵生産学科の創設とともに開講
