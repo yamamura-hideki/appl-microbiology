@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SOIL HUNTER ソイル・ハンター｜山梨大学 応用微生物学研究室</title>
+<meta name="description" content="レーダーを頼りに土を掘り、希少放線菌を探すレトロミニゲーム。山梨大学 応用微生物学研究室の研究をもとにしています。">
+<meta property="og:title" content="SOIL HUNTER ソイル・ハンター">
+<meta property="og:description" content="土のひと粒から、次のクスリを。90秒で何株の放線菌を見つけられる？">
+<meta name="theme-color" content="#0B0D30">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1F2152;--lagoon:#0F8FA8;--pink:#FF5F8F;--mango:#FFB23F;--sky:#CDEFF7;--violet:#5B3E8E;--ink:#0B0D30;--cream:#FFF7DC;--pix:"Press Start 2P",monospace;--dot:"DotGothic16",monospace}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;color:#fff;font-family:var(--dot);line-height:1.7;
+  background:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px) 0 0/16px 16px,
+             linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/16px 16px,
+             radial-gradient(900px 500px at 80% 0%,rgba(255,95,143,.22),transparent 60%),var(--ink)}
+a{color:var(--sky)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;max-width:1000px;margin:0 auto;padding:12px 16px}
+.top a{text-decoration:none;font-size:14px}
+.top .logo{font-family:var(--pix);font-size:11px;color:var(--mango);letter-spacing:.1em}
+main{max-width:1000px;margin:0 auto;padding:4px 16px 48px;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:40px;align-items:start}
+.game{position:relative;width:100%;max-width:440px;margin:0 auto;user-select:none;-webkit-user-select:none}
+.hud{position:sticky;top:0;z-index:4;display:grid;grid-template-columns:1fr 1.2fr 1fr 1.3fr;gap:4px;background:var(--navy);border:3px solid #fff;border-bottom:0;padding:6px 8px;font-size:11px;line-height:1.3}
+.hud b{display:block;font-family:var(--pix);font-size:11px;color:var(--mango);margin-top:3px;white-space:nowrap}
+.hud .t-low b{color:var(--pink)}
+.bars{display:flex;gap:2px;align-items:flex-end;height:14px;margin-top:2px}
+.bars i{width:6px;background:rgba(255,255,255,.18)}
+.bars i:nth-child(1){height:4px}.bars i:nth-child(2){height:6px}.bars i:nth-child(3){height:9px}.bars i:nth-child(4){height:11px}.bars i:nth-child(5){height:14px}
+.bars i.on{background:var(--pink);box-shadow:0 0 6px var(--pink)}
+canvas#cv{display:block;width:100%;aspect-ratio:320/416;image-rendering:pixelated;image-rendering:crisp-edges;background:#000;border:3px solid #fff;touch-action:none;cursor:pointer}
+.overlay{position:absolute;inset:0;display:none;align-items:flex-start;justify-content:center;background:rgba(11,13,48,.9);padding:14px;text-align:center;z-index:5;overflow:auto}
+.overlay.on{display:flex}
+.panel{width:100%;max-width:360px;margin:auto 0}
+.kicker{font-family:var(--pix);font-size:10px;color:var(--sky);letter-spacing:.12em;margin:0 0 8px}
+.title{font-family:var(--pix);font-size:30px;line-height:1.25;margin:4px 0;color:var(--mango);text-shadow:4px 4px 0 var(--pink),8px 8px 0 var(--violet)}
+.sub{margin:8px 0 12px;font-size:18px;letter-spacing:.2em}
+.story{font-size:14px;text-align:left;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.25);padding:10px 12px;margin:0 0 14px}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px}
+.btn{font-family:var(--dot);font-size:16px;border:3px solid #fff;background:var(--pink);color:#fff;padding:8px 16px;cursor:pointer;box-shadow:4px 4px 0 #000;text-decoration:none;display:inline-block;line-height:1.4}
+.btn.alt{background:var(--lagoon)}
+.btn.ghost{background:transparent}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+.btn:focus-visible{outline:3px solid var(--mango);outline-offset:2px}
+.hi{font-family:var(--pix);font-size:9px;color:var(--mango);margin:14px 0 0}
+.kicker.secret{color:#FFD34D;font-size:11px;animation:blink .5s steps(2) 8}
+.secret-glow .game.quake{animation:quake .45s steps(6)}
+@keyframes quake{0%,100%{transform:none}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,-1px)}80%{transform:translate(3px,1px)}}
+.ov-flash{position:absolute;inset:0;background:#fff;z-index:8;pointer-events:none;animation:flash .55s ease-out forwards}
+@keyframes flash{0%{opacity:.95}100%{opacity:0}}
+.fx{position:absolute;inset:0;width:100%;height:100%;z-index:7;pointer-events:none;image-rendering:pixelated}
+.nsp-title{font-family:var(--pix);font-size:17px;margin:2px 0 4px;letter-spacing:.04em;text-shadow:3px 3px 0 #000}
+.nsp-title span{display:inline-block;animation:wave .9s ease-in-out infinite,rainbow 1.2s steps(6) infinite}
+.nsp-title span:nth-child(2){animation-delay:.07s,.1s}.nsp-title span:nth-child(3){animation-delay:.14s,.2s}.nsp-title span:nth-child(4){animation-delay:.21s,.3s}
+.nsp-title span:nth-child(5){animation-delay:.28s,.4s}.nsp-title span:nth-child(6){animation-delay:.35s,.5s}.nsp-title span:nth-child(7){animation-delay:.42s,.6s}
+.nsp-title span:nth-child(8){animation-delay:.49s,.7s}.nsp-title span:nth-child(9){animation-delay:.56s,.8s}.nsp-title span:nth-child(10){animation-delay:.63s,.9s}
+.nsp-title span:nth-child(11){animation-delay:.7s,1s}.nsp-title span:nth-child(12){animation-delay:.77s,1.1s}
+@keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes rainbow{0%{color:#FF5F8F}17%{color:#FFB23F}33%{color:#FFE38A}50%{color:#7CE0B5}67%{color:#38D0E8}83%{color:#C59BFF}100%{color:#FF5F8F}}
+.nsp-burst{position:relative;margin:0 auto;width:150px}
+.nsp-burst::before{content:'';position:absolute;left:50%;top:50%;width:230px;height:230px;margin:-115px 0 0 -115px;border-radius:50%;
+  background:repeating-conic-gradient(rgba(255,211,77,.45) 0 9deg,rgba(255,95,143,.12) 9deg 18deg);
+  -webkit-mask:radial-gradient(circle,#000 25%,transparent 68%);mask:radial-gradient(circle,#000 25%,transparent 68%);animation:spin 7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nsp-burst #cslot{position:relative}
+.nsp-burst .chara{animation:zoomin .7s cubic-bezier(.2,1.6,.4,1) both;filter:drop-shadow(0 0 8px #FFE38A)}
+@keyframes zoomin{0%{transform:scale(0) rotate(-30deg)}100%{transform:scale(1) rotate(0)}}
+.newsp.stamp{animation:stamp .45s cubic-bezier(.2,1.8,.4,1) .35s both,blink .5s steps(2) 1s 6}
+@keyframes stamp{0%{transform:scale(2.2) rotate(-6deg);opacity:0}100%{transform:scale(1) rotate(-2deg);opacity:1}}
+.chara{filter:drop-shadow(0 0 6px #FFD34D) drop-shadow(0 0 12px #FF9ED8)}
+.zc.sec{border-color:#FFD34D;background:rgba(255,211,77,.08)}
+.zc.sec .zs{color:#FFD34D}
+.zq{display:block;width:40px;height:40px;margin:0 auto;font-family:var(--pix);font-size:18px;line-height:40px;color:#FFD34D;border:2px dashed rgba(255,211,77,.6)}
+.chara{display:block;margin:4px auto;image-rendering:pixelated;image-rendering:crisp-edges}
+.chara.lock{filter:brightness(0) invert(1);opacity:.3}
+.cslot-anim .chara.lock{opacity:.6}
+.cslot-anim .chara{animation:hop .6s steps(3) infinite alternate}
+@keyframes hop{to{transform:translateY(-6px)}}
+.colony-cv{width:96px;height:96px;image-rendering:pixelated;display:block;margin:6px auto}
+.steps{font-size:13px;color:var(--sky);margin:6px 0}
+.steps span{opacity:.35;transition:opacity .2s}.steps span.on{opacity:1;color:#fff}
+.bar{height:12px;border:2px solid #fff;margin:8px auto;max-width:240px}
+.bar i{display:block;height:100%;width:0;background:var(--mango);animation:fill 1.2s steps(12) forwards}
+@keyframes fill{to{width:100%}}
+.gname{font-family:Georgia,serif;font-style:italic;font-size:24px;margin:2px 0 0;color:var(--cream)}
+.kana{margin:0;font-size:13px;color:var(--sky)}
+.stars{color:var(--mango);letter-spacing:.2em;margin:4px 0}
+.desc{font-size:13px;text-align:left;background:rgba(255,255,255,.06);padding:8px 10px;margin:8px 0}
+.pts{font-family:var(--pix);font-size:16px;color:var(--mango);margin:6px 0}
+.newsp{background:var(--pink);color:#fff;padding:6px 8px;font-size:13px;margin:8px 0;animation:blink .5s steps(2) 6}
+@keyframes blink{50%{background:var(--violet)}}
+.big{font-family:var(--pix);font-size:20px;color:var(--mango);margin:8px 0}
+.rank b{color:var(--pink);font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin:8px 0}
+.chips span{font-family:Georgia,serif;font-style:italic;font-size:12px;background:rgba(255,255,255,.1);padding:1px 6px}
+.zgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:8px 0}
+.zc{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.25);padding:4px 2px;font:inherit;color:#fff;cursor:pointer}
+.zc canvas,.zc img{width:40px;height:40px;image-rendering:pixelated;display:block;margin:0 auto}
+.zc .zn{font-family:Georgia,serif;font-style:italic;font-size:8.5px;display:block;line-height:1.15;min-height:2.3em;word-break:break-all}
+.zc .zs{font-size:8px;color:var(--mango);white-space:nowrap}
+.zc.lock{color:rgba(255,255,255,.4);cursor:default}
+.zdetail{font-size:12px;text-align:left;min-height:3em;background:rgba(0,0,0,.25);padding:6px 8px}
+.howto{text-align:left;font-size:13px;padding-left:1.2em;margin:8px 0}
+.howto li{margin:4px 0}
+.pad{display:none;grid-template-columns:repeat(3,68px);grid-template-rows:repeat(2,56px);gap:8px;justify-content:center;margin-top:14px}
+.pad button{font-family:var(--pix);font-size:16px;background:var(--navy);color:#fff;border:3px solid #fff;box-shadow:3px 3px 0 #000;touch-action:none}
+.pad button:active,.pad button.on{background:var(--pink);transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+.pad .u{grid-column:2;grid-row:1}.pad .l{grid-column:1;grid-row:2}.pad .d{grid-column:2;grid-row:2}.pad .r{grid-column:3;grid-row:2}
+@media (hover:none),(pointer:coarse){.pad{display:grid}}
+.tools{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:rgba(255,255,255,.7)}
+.tools button{font:inherit;color:#fff;background:transparent;border:2px solid rgba(255,255,255,.4);padding:2px 10px;cursor:pointer}
+.side h2{font-family:var(--pix);font-size:13px;color:var(--mango);line-height:1.6;margin:0 0 10px}
+.side section{border:3px solid rgba(255,255,255,.85);background:rgba(31,33,82,.7);padding:16px 18px;margin-bottom:18px;box-shadow:6px 6px 0 var(--pink)}
+.side p{font-size:14px;margin:0 0 10px}
+.side ul{margin:0;padding-left:1.2em;font-size:14px}
+.side li{margin:6px 0}
+.side .note{font-size:12px;color:rgba(255,255,255,.65)}
+@media (max-width:820px){main{grid-template-columns:1fr;gap:28px}}
+@media (prefers-reduced-motion:reduce){.newsp,.newsp.stamp,.nsp-title span,.nsp-burst::before,.nsp-burst .chara{animation:none}.bar i{animation-duration:.01s}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a href="../../">← 応用微生物学研究室</a>
+  <span class="logo">SOIL HUNTER</span>
+</header>
+
+<main>
+  <div>
+    <div class="game" id="game">
+      <div class="hud" aria-live="off">
+        <div id="hTime">TIME<b id="vTime">50</b></div>
+        <div>SCORE<b id="vScore">0</b></div>
+        <div>深さ<b id="vDepth">0cm</b></div>
+        <div>RADAR<div class="bars" id="vBars"><i></i><i></i><i></i><i></i><i></i></div></div>
+      </div>
+      <canvas id="cv" aria-label="ゲーム画面：土の断面"></canvas>
+      <div class="overlay on" id="ov" role="dialog" aria-modal="true"><div class="panel" id="panel"></div></div>
+    </div>
+    <div class="pad" id="pad" aria-label="移動ボタン">
+      <button class="u" data-d="0,-1" aria-label="上">▲</button>
+      <button class="l" data-d="-1,0" aria-label="左">◀</button>
+      <button class="d" data-d="0,1" aria-label="下">▼</button>
+      <button class="r" data-d="1,0" aria-label="右">▶</button>
+    </div>
+    <div class="tools">
+      <span>操作：矢印キー／WASD・画面タップ</span>
+      <button type="button" id="mute" aria-pressed="false">♪ 音 ON</button>
+    </div>
+  </div>
+
+  <aside class="side">
+    <section>
+      <h2>このゲームについて</h2>
+      <p>土1gの中には、およそ100万もの放線菌がすんでいます。特に多いのは、落ち葉などが分解されてできた<strong>腐植</strong>を含む層です。放線菌は、抗生物質など多くの「クスリの種」を生み出してきた微生物です。</p>
+      <p>ところが、ふつうの方法で土から分離すると、その9割以上がストレプトマイセス属。それ以外の<strong>希少放線菌</strong>は、見つけるだけでもひと苦労です。</p>
+      <p>当研究室では、腐植酸を使った分離培地や、泳ぐ胞子の性質を利用した分離法を開発し、まだ誰も見ていない放線菌を探しています。</p>
+    </section>
+    <section>
+      <h2>研究をもっと知る</h2>
+      <ul>
+        <li><a href="../../research/isolation/">放線菌に関する研究</a></li>
+        <li><a href="../../research/isolation-media/">放線菌の新しい分離培地（HV寒天）</a></li>
+        <li><a href="../../research/motile-actinomycetes/">泳ぐ放線菌の高度選択分離法</a></li>
+        <li><a href="../../join/">配属・進学を考えている方へ</a></li>
+      </ul>
+      <p class="note" style="margin-top:12px">※「深く掘るほど希少な菌が出やすい」などのルールは、ゲームとして遊びやすくするための設定です。</p>
+    </section>
+  </aside>
+</main>
+
+<script>
+(function(){
+'use strict';
+var COLS=10,ROWS=60,T=32,VR=13,SKY=4,TIME=50;
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+cv.width=COLS*T;cv.height=VR*T;ctx.imageSmoothingEnabled=false;
+var $=function(id){return document.getElementById(id)};
+var ov=$('ov'),panel=$('panel');
+
+/* ---------- 放線菌データ ---------- */
+var GEN=[
+ {n:'Streptomyces',k:'ストレプトマイセス属',t:1,c:'#E8E2D0',m:0,
+  d:'土から分離される放線菌の9割以上を占める最大のグループ。気菌糸の上に長い胞子の鎖をつくる。ストレプトマイシンやエバーメクチンなど、多くの抗生物質を生み出してきた。'},
+ {n:'Micromonospora',k:'ミクロモノスポラ属',t:2,c:'#FF8C3F',m:0,
+  d:'菌糸の上に胞子をひとつずつつける希少放線菌。抗生物質ゲンタマイシンの生産菌として知られる。'},
+ {n:'Amycolatopsis',k:'アミコラトプシス属',t:2,c:'#F2D16B',m:0,
+  d:'MRSA感染症の治療に使われるバンコマイシンの生産菌を含むグループ。希少放線菌が医療を支えている代表例。'},
+ {n:'Saccharopolyspora',k:'サッカロポリスポラ属',t:2,c:'#FFB6C9',m:0,
+  d:'抗生物質エリスロマイシンの生産菌（Saccharopolyspora erythraea）を含むグループ。'},
+ {n:'Actinoplanes',k:'アクチノプラネス属',t:3,c:'#FFB23F',m:1,
+  d:'胞子が鞭毛で水中を泳ぐ「運動性放線菌」。化学物質に引き寄せられる性質（走化性）や、花粉に集まる性質を利用すると、土から選んで分離できる。'},
+ {n:'Dactylosporangium',k:'ダクチロスポランギウム属',t:3,c:'#38D0E8',m:1,
+  d:'指のような形の胞子のうをつくる希少放線菌。泳ぐ胞子をもち、γ-コリジンに引き寄せられる性質を使った分離法で効率よく見つけられる。'},
+ {n:'Streptosporangium',k:'ストレプトスポランギウム属',t:3,c:'#C59BFF',m:0,
+  d:'球形の胞子のうの中に胞子をつくる希少放線菌。当研究室では、この属を土から選んで分離する方法を開発した。'},
+ {n:'Catenuloplanes',k:'カテヌロプラネス属',t:4,c:'#FF5F8F',m:1,
+  d:'泳ぐ胞子が鎖のように並ぶ、とても珍しい放線菌。Catenuloplanes japonicus の走化性（化学物質に向かって泳ぐ性質）が詳しく調べられている。'},
+ {n:'Nonomuraea',k:'ノノムラエア属',t:4,c:'#7CE0B5',m:0,
+  d:'属名は放線菌の分離研究で知られる野々村英夫博士にちなむ。土の放線菌を広く分離できる腐植酸-ビタミン寒天（HV寒天）は、早川・野々村によって考案された。'},
+ {n:'Nocardia',k:'ノカルディア属',t:2,c:'#F4A6A0',m:0,
+  d:'のびた菌糸がやがてちぎれて、短い棒のような細胞に分かれる（分断する）のが特徴。土の中に広くすんでいる。'},
+ {n:'Kitasatospora',k:'キタサトスポラ属',t:2,c:'#B8E0D2',m:0,
+  d:'属名は北里柴三郎にちなむ。ストレプトマイセス属によく似ているが、細胞壁の成分などが異なる。大村智博士らのグループが提案した属。'},
+ {n:'Actinomadura',k:'アクチノマデュラ属',t:2,c:'#D9A6E8',m:0,
+  d:'気菌糸の上に短い胞子の鎖をつくる希少放線菌。土をはじめ、さまざまな環境から見つかる。'},
+ {n:'Rhodococcus',k:'ロドコッカス属',t:2,c:'#FF7A59',m:0,
+  d:'赤やオレンジ色のコロニーをつくることが多い。さまざまな有機化合物を分解する力があり、環境浄化への利用が研究されている。'},
+ {n:'Microbispora',k:'ミクロビスポラ属',t:3,c:'#9EC5FF',m:0,
+  d:'気菌糸の上に、胞子が2つ縦に並んでつく希少放線菌。属名の「bi」は「2つ」の意味。'},
+ {n:'Microtetraspora',k:'ミクロテトラスポラ属',t:3,c:'#E8C77A',m:0,
+  d:'気菌糸の上に、4つの胞子が短い鎖になってつく希少放線菌。属名の「tetra」は「4つ」の意味。'},
+ {n:'Planobispora',k:'プラノビスポラ属',t:4,c:'#5FE0E0',m:1,
+  d:'細長い胞子のうの中に、泳ぐ胞子を2つだけつくる、とても珍しい放線菌。'},
+ /* ↓ シークレットキャラ（t:5）。通常の抽選には出ず、粘土層より下にまれに1株だけ現れる */
+ {n:'Planomonospora',k:'プラノモノスポラ属',t:5,c:'#FFD34D',m:1,
+  d:'細長い胞子のうの中に、泳ぐ胞子を1つだけつくる、とても珍しい放線菌。胞子を2つつくるプラノビスポラ属の仲間。'},
+ {n:'Actinokineospora',k:'アクチノキネオスポラ属',t:5,c:'#FF9ED8',m:1,
+  d:'気菌糸の上に、泳ぐことのできる胞子をつくる珍しい放線菌。めったに出会えない幻のキャラクター。'}
+];
+/* 放線菌キャラクター（32×32pxのドット絵。GEN と同じ順番） */
+var CHAR=["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABlUlEQVR4XsWXsUoDQRCGV8kDiAgBQYh2Vkoa7fIQ6Sy0Ex/ARtAU0YeQlBZ2PkKKdNqIRbBStBBBEfENlP9wjmTd3fnn9tQPjnCX3f3/nZmd45xTWJzf/MSljfOpOm8KLCJYTFjmzVp39mdYdhGCnU9HwJqC/YOd/GBJIVnqwN+5ZjwZgef3y5ncbWStweYxdATZqNE1gJxq4QTMGBOWOrDmH6gRyMlhztwSax1Yx6sRCBVYLIcQr+X8x14sqcqukn/QYCoSufSrW6t2Nv90oxHB65vTpOf2+l7xf60GIK4J+8AIY0ItwknxuYXl4mI4Oz9U0wSSKfDFP94eGO2S8e2T2946SUZCjYBgFWehDfwWZgPNpTW30en/8BN7rmE20FrpBteMPdcwG6gbqhM2Lx4L3Zduy12NeqUHpAL38ivI+PGqvrw+4ls4REgcDAlhQW3F1i6Isy9oPQCoNYB2irY6uXAMqzhQIyDIywgtNgV2DZj3AKBqQBaEibv71+K+fzSY8tE73i3vWfFKxL56a/ka/g++AMhjMDNj3eyjAAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABt0lEQVR4XmNgoBBICVn8p9AI8gHI8v/X9/ynqSNwGQ6zHOQAfI6gyHG4fIhuOS5HUBRChHxIqTxeQKkPidVPkiOwxSVIbFaMB045WNTgSyNMuFzx7N0JRmnrGrD07NYesrIKTB/IHJB52AzB6QAQQHYEuQCf5SCA1wEwRzRs+8DQ4CVAdJYCRQ1IPUgfLp/DAEEH0BoMDQeAgpHYaCAl+IlKA7QGLMRaAAkFWOLCrAFh5QSxiQ8GiHYAckH0tIodyd3fGVINEPzZF4j1EgRgLRzQAchyVEsJA+m2nwSzIFFpAMXygDYGMCYCbEniJqrcwBsCGJZvqCLCagQ4/4KFwWfeV7whQXw5QKLlxALiHUAjQLoDig8wKEwVxnQOLnECgGQHKCgFYzUSlzghQLIDqA2IK4iYCyH2/u1neJD9Fu4G5KhAFoerZ5hM0L3EOeBvP06DHtjZMigcOowif/4pYYthgGBJSGopCMr7MECoDCCqJAQ3y9p+ohiMC5BqOQgQDAEYgFVGoCIWHwD5GgQINcVggLg0ADUQ5IjrbyFaSjd+RHFHtz8/nE+s5WQBkCNw9RGwiQ96AACOCk8OxypUAAAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABqklEQVR4Xu2WoU/DQBTGD4JBzICCmgVVBDMzIEeCJyFBIyexS5AktRWI/Q1TJCQzJKAIGMwQDBQIQIFBIBAjr8u7Xcvdve+6JiD2S5at3d19r999fa1SM2b8MXPT6K8ubY54/uvHTam1FtACWIyF6LhzGOvpSapG9F9xnARUtSmWpMNcEaYDrnGVQIublrtAxzGQAya2fZ8mC3AGCNu+03lbFlDbxYHFq0McCHHEW8DvK54E0JeBvCP+OcEOINZW5oAN6U4IbUhwCFl4eNn0mhC3VBZMtBDYUkm4SNy6hYqYl/aUrpzFF+vt7IPQ6zbE7SLEu8AU/3rqItqawcO32m8PvE7AGQgVd3VPhjMCF1CWl/frydSDVP+OzsZPTzEDRWqNE7Wx+waflwguoL62Z13TdV4iuICqgTJQu9jJdD+3z9Xd6YqugbaCjvmb4fEq6qtoectac1AISdiGTZy4ivq54b6uKHZCsxEh0L3PSD2AEDNA1VNbNRd2ESpOiA4w/DCiFuuDrprw2W4ChZAXpCIen8cWHyX3uYWOO+v6GBUvheutN/Rt+N/wA7dC5+jhtAywAAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB30lEQVR4Xu2XPUsDQRCGV5F0NjYSrwkWpkoliJVgKRw2ll6TTrBIJVZCwCoIgoUgWKRR/AOp/AU2GlBBYqOFFzWI+NHYnczGWe9jZ3dWPbDIA0vuNjcz783Ozt0JMWDAf2NibDaCkYcune+heCC4ILxoySmv4ovu80nif8AmTmeDdjrfIy53CsHPzo9Jk9eXDzE/txhRInQkBIChV/GjenWZDDLujRoFmNjfPhL15iGZJZWqKHySI51uOEce7t7UMdK57GnrR9oRPoeNkg2YMuFCpgZwGVycPIbvVkFQ1EC6PsgMQMXCsFU9YMoG7izcAWlYS8ARoYNjl9nnCBqn967NKaY43VN06QfIPgCOdLsgPNgxlocX1LT1Q/UGMgOZTFgCp/GCmpqiggOsGlDBp6eEHAxam+tk2uMYMyDXEe8cAp9eM0J/077pCn+j8fsMSByDc2EtQZ64C1iYEaXVRlYTNW/BWUBpcknrkpq34Szgr+G9kHTu+3HLRXG7299eACwFnOOvAq8v2OXyBJSLWk/a4EKIdoH/MGV1QpcuCHsfsfUAwFoD8v0gqCUcU7gGB6wZQPDBhC2WAu4aMPX/OLwa+HIIIq7CnrRf22smHG2tVNU5N/iPoD5c8vygyZVPkgQCkmEpz94AAAAASUVORK5CYII=", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB40lEQVR4Xs2WK08DQRSFB2hCAgICjpqm9ZWkpugKUPwAqrCkAgSpWEEqQDQEV0X/AwKBINQQTBMMClIBdSUgIKlacqbMZPYxc+f2EfiSzW5nZ+45e+88KsQfMzeu/sZaKYyP7b/fs+OxBwCId06XEt7LR99sE/PcDNjEAUylZcYFy4Apnq8cywuYz1wTGW4GFC/XjdRnLqwMzIKJDNjKwCG1BGoiUctqGmWILEMl/PZ4Ij8iW6wnTLhWAeAuRV0CBA72VsnsISsQSYMrroF4q1YJzTu1nvF+nP7WL1SClLCJacCVOvQLX2/kFY+vS6AmHDXxJgVlNk2wNyJbhlwrBx+VLdblHAvaH9JE0C6FaPc+jPQKuVx0JiFbHcr3aZlEDLSrO/p5GcAASjgOjPiUk9wJI+KbDSEvD66CZWu5TJwZSIg/jE4/X7q9jNgOvpyZIDOgYYr74m9gRvAN7NyK3MF60o6tnYBtIJffTQ1pa6dgG5g2fjvhc22kW2iK3vlAezBLYbbr/gsXpF8/A4WmNVBvqyxyd53I+66HsILcCbm7INa+gtoDADkH5EFSHUYC2+CKAzIDCnUYYYt1ga8GPucA8JsDvwFh4qk/GnLY+oz4ONtf0b99xcdC/RWLD7a1/3t+AAIH7GZYOEB0AAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABdklEQVR4XmNgGAUUAikhi/8UGkE+AFlecu/9f0ocwUSu9SBLo85sB2sH0eQ6giQHYLOkW1EAww+kOIZoB8B8jG546f0PKA7ApQ4XIMoB+IIbOQTwqaPIATCALbjRQwAEsKmjigOItQybOqo4YDQEBmUIYAM0SwO0AIzEGgorgOT2bcCr5ZFTAFz+2bsTBM0nqAAEQJYTshgdgBxCjAMIloTIloMSIbGFjMSMfqLqBLwhgG45KYkLBH7dus/wIqMQb0gQDAEYINVyYgHRDqAVINkBx/XFGZ4HZmG4B5c4IUCyAxSUgrGaiUucECDZAdQGLMQYeHz/CbAyS0cLBsn10+BaQFEB4sNoGICpN5YWJ2g8UQ4AWYwNYLMcBIixGAYIloSkloKgvA8DhMoAECCYBkDFKahYRTYYFyDVchAgGAIwAKuMQEUsPgDyNQgQUw+AAFFpAGYgyBF/HjwF89909KC4Q6SiBM4n1nKyAMgR2DoeuMQHPQAAxCazRbD9SwMAAAAASUVORK5CYII=", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABqklEQVR4XsWWIUzDQBSGbwSJQqIW3DwC5jALDgEkBIOZwWBJKhCIJVgMemYhAcQcmcEBAk/CFCEgECQkeMjf5Y3btdf3/huEL2nWu6z9v95d37XmElmYX/4KL319v6uxt6MvAAi/vrgtZK1urtASM6xxLBxAqmxkqqAEysIHV/cT92clzAJhuAS31pZyAV+EkTALhEiwELatJAn4Txs7t5Ik4D9t7NxKkkA452VtK1QdiL0F4fwz9YASqCpCAhMO6ClAuUVIGWz4VGA6cGTtfv7LVkCBHgEh3HhSNiIwyw5D7EmlnxUxL0IJOD8u7oI+Wwej9WEVMQkgXAsOgYhFQl0Dfnij5fLDQme/a9qaK0cgDH8YWKJ/GL48uuxkt3Ik1BEQ2HArZoG/ghZotp3b6WwUfGL9GrRAfbEYDmL9GrTAb2OqhM3Pfp57M7fuetnl2EGmAn1+v/x/6Bqqr0kAwQzdDz1YUCshWwXx7gtaDQDqGkA5RVn1bxyDDQfqCAiyGaHEVoGnBpZ9AJjWgNwQEs9vT3n79OxwwmNv+2jctoYnEfv6mear6F/5Bgw/yGANPlGYAAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABtElEQVR4Xu2WLVMDMRCGA8MvQHKm8AtgBoGAVuD4MggsAnwFOEQFrgYNiNpaDvAtzIBg5joYcMUUiYCpLvOmbCZJk8sGTiDumam4fOz73u4mVyFKSkpKCmBudmXEDWOvneZu9IGAjaVVrwnMk2hobTQIeL5+pARsMD96eJW/0NpoOAFtA65SzUQrR/D+8TiVbO7L/hjctOROPGOcwvy6BxCkkd2LvPoDXcxVougM+Dqexl2ClAmYJaghVSpCkMBgey93aZK2nW+O/VoZZOaQQVYG5OaAMEHrklQYtbaBODITzIAhXt8Zxzm7CiVMZJ9fYqtza5TEVaZcAxPiDGEd3YRdAuoV/imIFA9B2eAbKICLk0vcAzISHd94A626qHTvJu34xoVQJ+Dw9ECJUxNGG6gs7Dpz4Rt3QeKYYx3Dv6CffWBfVDwDi/NjD72+eKuuKT96KfRxtb77bHi3xfkZ6PW9SYCw3ROZJkxN5xIHcRcRA5x9wr6IXASbUH5I0rYR2EesOCsDBF0c17UNrwGAt3Y1mw9eE/50L0y8DIcy1vFTx4jZXK6pZ1+9C0H/k6njG//3fAO0N/tEW7sZWgAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABp0lEQVR4Xu2XIU8DQRCFtwT+AAJRAQRTTxA1FUgQBGhwxYAg/QeYIjjT8A8QYKgjBIJBIjAVhASDRJCAaEhrcAjIuzCX6XJ7M3P0UP2SS2+vm33v3s3O5ZwbM+YPlKerXziwBD8vhDSxx4/X+MB//NxioKSZDIGbl4t46sps3fFz8NbvligJAtc0a6smUcS+GIlwcW5OY0JtgPDTAH4iZFSTwKRmEhenx/Dv+IXGx1SIeYpRFZOfQFrR+Wief274nW4etXPdOWFKgEOVX91fd932lXn7EaYi5NtxVKgToDveeWhlap8uRqZtqDIAcUnYB0Y0hTghRcnFGzNL8aFhrbM31CFDZCbgi3d69xrthPennrtuHGcmISZAWMW1qA0UhdlANLfqzpZPfvkJXZcwG5hfqKeuGbouYTYwalSdMLr8jHVbG1Nu+3Y38YBHgTH9EjS/WZHtqgxAOI00cdCsDGTlH8ROaO2C2PuE1AOAWANop2irfOEQVnEgJkDQywgtNgvcNdC8B4CqBmhBmBg89+Px3cH5kI/a4VYy1ornIvQFVPiXUVF8A8d2/EOgboUFAAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABoUlEQVR4XmNgGAUjHTCSGwBSQhb/YXqfvTtBtjlkAZDlP04dg2Nkx5AKmEjVQG1AUtDh8ikoCmgeJfiCnZIoGdpRgB705OQKotIAetzf29EHtkvJowjOhvGRATHZk4VQqgZZDrMQmyXoAE3tf0KOIOgAbADkcxAAGa7kUQQvkMgBZEUBsYCQ70GAKAeAACwd3JqSgdd+tZwZ8NBBVwgyA91RRDkApJGQxegA5BBky2BpCRR9yOIY5QB6ike2nMPOCYyJAavLw3GWnMgAxQEwV8IcgW75j0P7wJgYoC8rSJQjiC4JibUYF4DmGIyESbQDqAGw5QoUB+ByJTLgjoxn0K7ehOEeXOKEAEYIYHMlMlBQCsZqJi5xQoCuUYANEFUUc78UAOv9Kv6B4WqrH9wcWFSAxJDFYeoZGN4TCgDiHACymBRw7Nd9opUTLAlJLQUvPkb4OrRzJcE0RTANgBIlqFhFNhgXINVyECAYAjAAKx1BRSw+API1CBDKTTBAVCKEGQiOjhefwPzqhdtR3NEa7wnnE2s5WQDkCGzNc1zigx4AAJr/5hycONYmAAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABdUlEQVR4XmNgGMpASsjiPwgPiB9AFsMAJY5gIsX1hHxMSJ4igM3HILHirhngECA3RFjIdRXIwqdvj4O1L+9YQK4xxDvg2bsTjNLClv8jKxKwWkZInmIwGgWEgpiQPMVgNAoIBTEheVyA7HKAXAvRAUlFMTJAL//JrQ8YiU2dMAvmnZuFV0uSURpYHhRCxJhNlCKQ5YQsRgcghxDjCIJRgGy5kZgCGBMDapbUERUteEMA3fJzrx4QYzcc3Lv2hKElpglvSBAMARgg1XJiAdEOoBUg2QHu8roM6Y4NGO7BJU4IkOwABaVgrGbiEicESHYAtQFRRbH7+ntge3cGKjHM3I8IflBUgPgwGgZg6qersxF0L1EOAFmMDWCzHASIsRgGCJaEpJaCoLwPA4TKABAgmAZAxSmoWEU2GBcg1XIQIBgCMACrjEBFLD4A8jUIEFMPgABRaQBmILgvcO8lmD+/biaKOxKb0uF8Yi0nC+DqftG0W0ZLAABArgm5uh0XyQAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABpElEQVR4XmNgGAVDCUgJWfwHYVxuJiRPNoAZ/OnBdzDG5giQGLI8PociAxZCrgIZdOPcfkLKUABMvYaR4/9n704w4tNM0AHIQMPIEczFZihIDGQhSJ4UB+N1HQggByUh38AAOXqwAvR4JTYeSNHHRKyhAwZAvmnNWkJ0qoZFG6l6cAJSghNmOb7sig5IjgJCBVF2RA71Y2tACyJYvkf3Ob6QwFVWYAMEywH0vL1/yga8QeyYE0B9B4B8S8hidAByCDEFF8FEiGy5tJ0AGBMDppX3E4wmEMAbBeiWPz30gRi74eD64/sMWZ2FeEOCYAjAAKmWEwuIdgCtAMkOUIsUZ3CrzsJwDy5xQoBkBygoBWM1E5c4IUCyA6gNiGoRqb08Abb3lrgFw67WaXA3IEcFsjhM/XUGcYLuJcoBIItxgQd2tgwKhw6jSG/8RdhiGCBYFJNaCoLyPgwQKgNAgGAaABWnoGIV2WBcgFTLQYBgCMAArPYDFbH4AMjXIEBMPQACRKUBmIEgR9x/8RTM717Yg+KO0vgSOJ9Yy8kCuLpfNOuW0RoAAPdS+nfbCfvUAAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABwElEQVR4Xu2WPUvDYBDHTxHciy4GtBZ3VycnQRCnKoiDi5MfQDdHXVScO7kIloI4uQh+ALfSqYtYX4hLS3F1MXKNl+blLnePVnTobylN8tz/97wmAEOG/DEjg8ifKiwE8Tqv3Ttz3bGfCmD49k0pUeZsGQKrhLNAurccKBSXwDaSkDhUXCO+tw+sBAViG79RBm/+ip0adgT6jfpDyYUjc/sFuD/ossWpDkyUwW8AeLF6REZAaoQ9wmFNdxcFJLANhobh/AiwoETwchRo8433F09XTM9JkqPcjdDcwVghvh7Sj7ICiHUbWaGpTY/qwLYhFebE8xaj+cSiAH9nNrfTXqXFjqC0HU0CvcZKcBoUSY8Gd7aoAonwrd0w5/xEnfp65wNWL5/UtZQrkAk3BMexSIi7IINjuBW7wC/hLnB4AcXqe1ZHuq7gLFAsrbElpesazgKDxnYSTm6Eue0aPG6ORw44FfiffiPo+U5V9bUJtGtsITYcAOpNPZhwO4gM4N4nLAeRugZ6r+ZKK1FYwjUcUUeAoJfR9fqMKIBgrxHr69y2Br4KokTzLfym2Lt9TogcL01H/63h3wIluE816fq/5xMN7APHJDrXogAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABhklEQVR4XtWXvUoDQRSFR8kTxE6bYOcLiLG2ExGxFSSFoGXKoCj+9GntRLAVCbb2EV9AEBtFBYv4CsoZuHGyOzP3zBDZ+MHCzk1mz5k7d+6yxvx3ZutL37gqWQeEhVwT05rz3BXmzhuBWaFPiJknqBmIAaH3Qd/gyt2CWkzg4+t+am6maQsM91E3DrnzSjCprHwLVvc6bGK8VL4FVBFilTlFljvPWws7+71Ss4GplLgPKgMTgW+1bGxsuIJy/GQLimNWlG4uUoRnt/3osw/WmvZ3tnFRBiCuCReBEcaEWoSu+MqCsRfDbveSOrrRDBTF7x4Z6V/enp/MeXs7mgk1A0KqOAtt4K9INtBaNuZ4a7PkJxTXSDbQmC+Lg1BcI9nAuIm+joXWQ8/eXiyum6Or62FctgIxNy7/P63rZ5YyAOEUGGFB7YSpXRBnX9B6AFBrAO0UbdV9cIhUcaBmQJCXEVpsDKwaMO8BQNWAPBAmPl9f7PimezjiY6N9Mhyz4lmEPrlC8YnnBw3RBhvwuXEoAAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABgUlEQVR4Xu2WsUrEQBCGV/EBxBQHXiM2WsoVmrS2lnaCPoCVoLWFYKdg5QMo+AaWClaeFofFFYp2gmAjdmJ18i/MEtdk5x+JWngfhGX35mb+zCQzcY5gciIf4CJMPVb7JHAmMCKs9qPsXf0p1pRa7YclULGm1Go/LIGKNaVW+/9dgjEt/08v3ZF2Vgy21udCn8dZ6n/trHBir5F0VAZ1Fad7hzdeWOycsYmhBciUwwohEBFTPteyJNACZBL2TheTWe0snfvfGxWA4FrgGAhhRKjjuBx8fGbVXwxHB0XIWopkCeLgr3fHTOxA//7NrW1cJjOhZkCwBmehBfwUZgGtfNctrNx+0VN3rmEWMDW9XOmz7lzDLKBp1FkAWt15vz7n1+7qZDZoQCmwl1UQ+352oeqlBCBwFVXBwRkRWFBbsbUL4t0XtB4A1GcA7RRttey4DmtwoGZAkGGEFpsCdw2YOQCoZ0AcQsTD47vf7+z3PunY3uyEPRv8W9R9cDb6IfqbfAC1mv6gVTqK5wAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAByUlEQVR4Xs2Xvy8EQRTHh/gHKK7Q3EWBRHPRUCAUuiv8aBQkotIRDYlEIZGcRuhUcgmFjuI6BUFBIxoiCqG54gqF6Ml35W3m5nb2vbe7wifZYmd25/vd9968uTPmj2lJqt/ZMfjlvlt7v1Gvp34BQHzrudrkfb27FJrAMxJDrdoI+MQBTGEeV+/aYmSUXNq0BmxOr+/D24mhojk8qBoIg6fyviglqQzYQHxuoRSkAUjCD9Qp8AFxQiqeqYGkpEoB8h6FvUW5aKQy4BYhQYUYUDax2zGVAbcIAcSxA6T1kJkBKkK7GUnIbBckJVUEfEWoQX0WRB1CNlzVu4gNkPD43XHsB571zwTzUiMiAxDnhF1gRGKCLUJbfDmXCy4JA0fbbLpAbARc8d16XaId8vH4Zm5nV2MjwUaA0IpLERv4LdQGKvm8uRhbafLjG+dQGyh0TUeu6RvnUBvIGlErrpz8/Pabnyya0fOd0IOdCnucnp/qaWf9igxA2MfryLApXF41TEuECbYTarsg9j7B9QDA1gDaKdqqvbAPrThgI0DQYYQWGwe+GkjOASCqAVoQJj5fasH9w8Zeg4++zaXwXiqeCPrr5b7sG//3fANmaLXMWreuugAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACBElEQVR4XsWXv0sDMRTHU9F/QFDBKhZnwbWLdukoFRScBVFcHYogCIWCS4fuhYqzQ4Xi6KIubqWTuFWwQi30H3CovKQvl+Ty8w65DxztJbn3fXl595LLkRSsLhan+Pj35C2XwlQ4ID4dP/BLdAb+i/ciavucrdMEGBl+XErdcI/CtYsVApcqRp/rH0jt82gFO/PbZJo0nCAK1Joj9guONIvUHtona1Uy7BOuQx0wdRpDMKN7f8eHjCaRME4AxWEQtMHkmHiHj6FLwDo7hHw1pM4QTs+P6XAxemokUUds50uAHiYNvy+qfSkJ/1tch+RAFmTuAM+BJFSOWOKlIfMIJAarXqu+T8uuqfS6SBwB3TvuEtMRnAOuTSb0VY55DQI6Iyg8fF6yTjRfGscqog3JgWhDimo1QNsdwirgiE80eA7IG1K0ZUriG9eEXh48tpa1y6UuoTUCMfHPuod0RO8jR/bOfngkdBGWktC6IQWKq1jPAyI+65YE63kgiK0uKVQW4o+Y2gV054HgQlTYPNT6a2pXsZ4HssCvEj6dMN/KbTLo/nI/xaUQ2/n49VvnnPwcKLeNhga7O6Tw8ir19zyEEecGEloF4d1HxBpgwpmENHNLY8mwiVBxwBkBBEsolFgbMGvAt5745cDMIDjxPmA+V2/Y1w/SuGJfRSHiiTCdftKcijLlDzKmPaJknkdVAAAAAElFTkSuQmCC", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB2klEQVR4Xt2XLU8DQRCGB4JDNAHHIRoMdWfBI1HgUMVAgkK0hqSqCQIQKAQfCQqJQvIDcA0KJEk5SBAkpD/gyGw719u52dvZ5gKEJ2ma3dvd993Z2bkW4L+wMLeSavZSOk67CAfnne9cpr75+DztH8nj+EPfYgiO0YjTOBQ3cBMknn/o25GZM6LMbN5gcATIhCTgM+CKTlAOaESkSPnm5ZnON94+H6Y0mVwllgEOGormV+Fi9ypIc9J5TlyZHtovURqBn+DXDaiRwq3tqwwu6GtrmPgIeEHRlG6Jwr3HhaR6QALJyXXpxqJW0zzX1hTLAIokjxsQxbfWAqbfI8xBIxoT2RGQOCy2AU3Qji3xtQjMR8Hdflc8Fn5UpREoiN8nCukxvdc+rJ92skhIEZ7h74IoBjEHQsU5doQBSMcyEJI8oZj3QwxpYsTHORZ+DbeXod49KOq7+nMMTdgJHmygvrQpbt7Vz+E3I9hA1RRyQOTredhda8BL5zAbgkeBbfrOoPEw6/WrM1BriAuJ4gDQG/iFCe9PsNAqiHefyNcAF94cMJnbaloLuwgVR7wRIKiEYoktA3eNaN4DiC4HRguiiaePdzOxfXNm+Tje2svaWvGJoD8cfLKr/8/zDRWpgE2qoFrNAAAAAElFTkSuQmCC"];
+var PTS=[0,100,300,600,1000,3000],NEWPTS=1500,SECRET_RATE=.15; // SECRET_RATE：1回のプレイでシークレットが現れる確率
+var STARS=function(t){return t>=5?'★SECRET★':'★★★★'.slice(0,t)+'☆☆☆☆'.slice(0,4-t)};
+var LAY=[
+ {name:'表層土',c:'#7A4E3A',c2:'#5E3A2C',sp:'#A8705A',delay:80},
+ {name:'腐植層',c:'#4A3328',c2:'#33231B',sp:'#7A5440',delay:120},
+ {name:'粘土層',c:'#9C5B3F',c2:'#7E4730',sp:'#C27A58',delay:180},
+ {name:'深層土',c:'#4B3566',c2:'#372650',sp:'#7258A8',delay:240}
+];
+var TIERW=[[72,24,4,0],[45,35,17,3],[25,35,30,10],[10,30,40,20]];
+var LAYER_COUNT=[6,10,5,3]; // 各層にいる放線菌の数（表層土・腐植層・粘土層・深層土）。腐植層が最も多く、下の層ほど少ない
+function layerOf(y){return Math.min(3,Math.floor(y/15))}
+
+/* ---------- 保存（ブラウザ内のみ） ---------- */
+var KEY='soilhunter.v2',OLDKEY='soilhunter.v1';
+var OLDNAMES=['Streptomyces','Micromonospora','Amycolatopsis','Saccharopolyspora','Actinoplanes','Dactylosporangium','Streptosporangium','Catenuloplanes','Nonomuraea','Nocardia','Kitasatospora','Actinomadura','Rhodococcus','Microbispora','Microtetraspora','Planobispora','Frankia'];
+var save={found:{},newSp:0,best:0};
+try{
+  var s2=JSON.parse(localStorage.getItem(KEY));
+  if(s2&&s2.found&&typeof s2.found==='object')save=s2;
+  else{var s1=JSON.parse(localStorage.getItem(OLDKEY));
+    if(s1&&Array.isArray(s1.found)){s1.found.forEach(function(v,i){var nm=OLDNAMES[i];if(nm&&v)save.found[nm]=v});save.newSp=s1.newSp||0;save.best=s1.best||0}}
+}catch(e){}
+function got(g){return save.found[GEN[g].n]||0}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify({found:save.found,newSp:save.newSp,best:save.best}))}catch(e){}}
+
+/* ---------- 音 ---------- */
+var ac=null,muted=false;
+function initAudio(){if(ac)return;try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){ac=null}}
+function sfx(f,d,type,v,slide,delay){
+  if(muted||!ac)return;d=d||.08;v=v||.04;var t=ac.currentTime+(delay||0);
+  var o=ac.createOscillator(),g=ac.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t);
+  if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.02);
+}
+function jingle(notes,step,type){notes.forEach(function(n,i){sfx(n,step*1.6,type||'square',.05,0,i*step)})}
+$('mute').addEventListener('click',function(){muted=!muted;this.textContent=muted?'♪ 音 OFF':'♪ 音 ON';this.setAttribute('aria-pressed',muted)});
+
+/* ---------- BGM：冒険のテーマ（D長調・8小節ループ） ---------- */
+var bgmG=null,noiseBuf=null,bgmStep=0,bgmNext=null;
+var BG_LEAD=[ // [16分音符の位置, MIDI音名, 長さ]
+ [[0,74,3],[4,78,2],[6,81,2],[8,86,4],[12,85,2],[14,81,2]],
+ [[0,83,3],[4,81,2],[6,78,2],[8,81,4],[12,76,4]],
+ [[0,78,3],[4,83,2],[6,86,2],[8,85,3],[12,83,2],[14,81,2]],
+ [[0,79,4],[4,83,2],[6,86,2],[8,83,4],[12,81,2],[14,79,2]],
+ [[0,78,2],[2,81,2],[4,86,4],[8,85,2],[10,86,2],[12,88,4]],
+ [[0,85,3],[4,81,2],[6,85,2],[8,88,4],[12,85,4]],
+ [[0,86,3],[4,83,2],[6,79,2],[8,83,2],[10,86,2],[12,88,2],[14,86,2]],
+ [[0,85,4],[4,81,2],[6,83,2],[8,85,6],[14,81,2]]];
+var BG_ROOT=[50,45,47,43,50,45,43,45];
+var BG_CHORD=[[62,66,69],[64,69,73],[62,66,71],[62,67,71],[62,66,69],[64,69,73],[62,67,71],[64,69,73]];
+function mhz(m){return 440*Math.pow(2,(m-69)/12)}
+function bTone(m,t,d,type,v){
+  var o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(mhz(m),t);
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g);g.connect(bgmG);o.start(t);o.stop(t+d+.02);
+}
+function bDrum(t,kind){
+  var g=ac.createGain();g.connect(bgmG);
+  if(kind==='k'){var o=ac.createOscillator();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);
+    g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+.15);o.connect(g);o.start(t);o.stop(t+.17);return}
+  var n=ac.createBufferSource(),f=ac.createBiquadFilter(),sn=kind==='s';n.buffer=noiseBuf;f.type='highpass';f.frequency.value=sn?1500:7000;
+  g.gain.setValueAtTime(sn?.07:.02,t);g.gain.exponentialRampToValueAtTime(.0001,t+(sn?.12:.04));
+  n.connect(f);f.connect(g);n.start(t);n.stop(t+.14);
+}
+function bgmSched(s,t,sd){
+  var bar=s>>4,p=s&15,L=BG_LEAD[bar],i;
+  for(i=0;i<L.length;i++)if(L[i][0]===p){bTone(L[i][1],t,L[i][2]*sd*.95,'square',.028);bTone(L[i][1]-12,t,L[i][2]*sd*.95,'triangle',.03)}
+  if(p%2===0)bTone(p%4===0?BG_ROOT[bar]:BG_ROOT[bar]+12,t,sd*1.6,'triangle',.07);
+  if(p===2||p===6||p===10||p===14)BG_CHORD[bar].forEach(function(m){bTone(m,t,sd*1.8,'square',.011)});
+  if(p===0||p===8)bDrum(t,'k');
+  if(p===4||p===12)bDrum(t,'s');
+  if(p%2===0)bDrum(t,'h');
+}
+function bgmTick(){
+  if(!ac||muted||document.hidden||(state!=='play'&&state!=='modal')){bgmNext=null;return}
+  if(!bgmG){bgmG=ac.createGain();bgmG.connect(ac.destination);var n=ac.sampleRate*.3|0;noiseBuf=ac.createBuffer(1,n,ac.sampleRate);var d=noiseBuf.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1}
+  var now=ac.currentTime;
+  bgmG.gain.setTargetAtTime(state==='modal'?.3:1,now,.15);
+  if(bgmNext===null||bgmNext<now)bgmNext=now+.05;
+  var sd=60/140/4*(state==='play'&&timeLeft<=10?.7:1); // 残り10秒で約1.4倍速に
+  while(bgmNext<now+.3){bgmSched(bgmStep,bgmNext,sd);bgmNext+=sd;bgmStep=(bgmStep+1)&127}
+}
+setInterval(bgmTick,60);
+
+/* ---------- テクスチャ ---------- */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function irnd(n){return Math.floor(Math.random()*n)}
+function mk(w,h,fn){var c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');x.imageSmoothingEnabled=false;fn(x);return c}
+var TEX=LAY.map(function(L){var v=[];for(var k=0;k<3;k++)v.push(mk(T,T,function(x){
+  x.fillStyle=L.c;x.fillRect(0,0,T,T);
+  for(var i=0;i<14;i++){x.fillStyle=Math.random()<.6?L.c2:L.sp;x.fillRect(irnd(16)*2,irnd(16)*2,2+2*irnd(2),2)}
+  x.fillStyle='rgba(0,0,0,.18)';x.fillRect(0,T-2,T,2);x.fillRect(T-2,0,2,T);
+}));return v});
+var ROCK=mk(T,T,function(x){
+  x.fillStyle='#2A2440';x.fillRect(0,0,T,T);
+  x.fillStyle='#6E6890';x.fillRect(4,6,24,20);x.fillRect(6,4,20,24);
+  x.fillStyle='#8F89B4';x.fillRect(6,6,10,6);x.fillRect(8,4,8,2);
+  x.fillStyle='#4C4670';x.fillRect(16,20,10,6);x.fillRect(22,14,4,10);
+});
+(function(){var im=new Image();im.onload=function(){var x=ROCK.getContext('2d');x.imageSmoothingEnabled=false;x.clearRect(0,0,T,T);x.drawImage(im,0,0,T,T)};
+  im.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAKZElEQVR42mWX25Mc51nGf9+hD9M9O7szu6vjWra0kiXZcSyXJdmuJI5sYxKMHUEVFVJUcUwVFOSG4o5DUfoPuOOC4ibFIQRjCGBXQQoqYMAmxBAflUSyLK12pZV2Z2dmZ6anT9+Bi5kVdtEXXV993d976qef933E71980gNMbx4PCGbX3sKDEIKsMvSyAgEcmk8wzgFgnEcKQRRovJ+uhZgeN87jvP+EOZjaA9CeT+xOX5oFMnX8scfeo4RACMG4dgRJg9p5hBA4awmcpXaOQEkkEu8d3sPU6l5qn0gRPXUw29hzLARiehL8rDqA9575RkgQaEZe8pVf/DkW2vOEYch771zm7//qW2ilKYZj8BCFIe00IJQS62ZePp4RIH7npSe8dQ4hBKGSe3FgncN5T6AkezFOKsNulnPg/iP8+MWfZOXICoU1ZPkEjIHaYb1n2Btibc0/vfZthtvbLM2nKDG1y97nkAIQ6EFWklc1cajppDFSTIMsa0NuLEvNaZnxUBlLq7PIo0+eZ/XBVXqDPus7PXZGQ9ppygMHD1Iaw+HOAu35FlmW8ea/vsmgt0MnCe8VX0pBZT3WWbQU0Ig0c1FAXpY0ohCFJAo1UaipjKFfWrwQFHnF42eOceG5p+n1+tzq9dnY6TLIxuyMxmyPRjhnkULy8H1HuPD8BXCeV//iFTIlSSM9BW1tGBcVlfPoTjPCe3DO4bWmP6kAT6AloZQki0t8+SeeJ0kTxllG2IgZZxmTqgQBgVaUlaG7O+ZOr48UgjSOCANN0kg4c/5xjDV857Vvk87QP79vmTAv2O0P0HtIE1KiBWhlqYXCBCG1Nbzw4hd5+Mwj1GWFdxaPYFyW3Or32M3G9EYjiqrCWHsPyFVdg4A4CDlzfJX9Bw9ivGdU1Ow/sMTPfu1Xef+td3j1Gy+jnZ/+RgIIlSQfFJx/9gJPP/8Mk/GYhcVFJuMx1+9ssjjfJg40W70exhi2BkN6w4yiNlNw+ynKHVMQV9biECglkVKilODM558ibS9gvcNYjw61orYOjyc3lgdOneT4qRN0Om10qOnu7rBvoYMTgo3uXVpJivOeYT7BWouxDmMMSqmP8QXMxTFHDxxg88YG//jqPyClRCjJ1bc/4O76HcY7OxzoNNFpFDKYFFjrGRSGL//0ixw+ssKd7g6bgx5FlZNVhkGWMcrGDLIJUkBR1XggiUOE8JS1mbGdIIkj5pIE4SxRFPH4E+fpbt3ljX9+Ha5eR129RhKFxGGAHuXlPX7yfkp9WocYbxlmQ6QK2RoOGGYTpJSM8pxxnlNWNUIImkmMAPKymmYpBe1mSqA1a9vbnDx8H888f4GbazcRQnDt/ctQ5OTWEWJRn33w0KWP83O3OyBpprQXWqRxQm0M1lnK2jLIxgxGY7KioqxqkjgiUBohBN5DZQzeT7l/Pk2QEsqqpioKljodTn36Yd76z/+ht7WN0ppQSdTTJ1cuMSMHJSQ31zZYv3WbRpJydPUYveGA7nDEbj5hZ3dEaWqUlsRBQBwEAKgZg+ZVRRBO+SQMAkId0B2OyMuCdrOJFBKtFOtr69i6Jgk18h5yZoSvwoDnvvAcj559jDvbdxnlBeOiZHuwi/WOwfaIrfUd0ii619EApBBUk4o717tICw7HIJswzHMGecH2cADec+4zT5AstCnKCiHENAApBMY6douKcG6OVnueoi653e+xPRpRlBV4j1KK7//bFf791benxOU8VWUoioo0jcm2c177+uvYrKaZJgRKsm9+jjQKqGuDlJIsy/B+2ns8Hi1m4DPAycfO8OwLP4YOAm5vb7MzztgdZwxGY7wABTRbDUIp0YHmO3/3FhsbW7ja8bkvPE6rk7DvcIe40cAYQyMMiYKIhSTmyNISxhj+5huvUPS6JHEIQqK1VoyyAtI5vnjxBeZac1xZv0l3NMRaxzDLsN4hhMQZy7lnHiIMAqSUHD66zIlHj+BqQdiQ7F9Z4pd+8yXCQDHOCqJWyKFOm32tBaK4QRiG9Lo77E5yBJJJUaKLypBVhuacJIoiqqpCCYEUAqkEy+02xlpGk4zaWHSoQMA4Lzj92DGElLOBxFFVhjDUs8w1jShkPknptFr0d4d8943vsnpylaMnjuGMJR9n6MGkZFxWhEXJ9WsfcfpTD7E4v0BlDLWzNKIIAaRRQG+UMSkrjLOMcouxljSKsH7aaINQU9U1nTAljposNVPSOGKwO+SHH1zm2pVrXPyZi8y358FDMclRT64evBRqhbA1V350DR0EHNi/j5XDh7F1TX80REhJEjcIdYCxBoQk1Jq8LLHeo6QkjiKaSuOqmrSZ4JznvsVl9nc6vPfuZX7w3g/46q//ClpprqxdZzyZkMYN9FIzBsB6yOqKv/3zl7l25UNaC/McP32Csw89xJW1NYqqZC6JicNlJlVJVhRIIejMNYnDAKcVhypLu7OfjSRgTgqWFxe5vXmX//iX1zlw6CBFVXH55g3evXEDD+xfaKMBnPMoKUilw0UBV99+l1E2IR+NUELSCjRKCrKyIo1C2mnCrX6fJIw4stRBSMU4zzl89AgLrXnUzjbLrRa9u13e+e/vc/fWJodWDqGVZFIWU9q3FiUE6rMnDl9CgEewcvwYZ548C3WJtIa19dt8743v8flnLxA0EqoyZ3+7w8HFZZy1xFqRxg2SKGLfQpuFJKXf7aKdwBjHy3/yTd5587+IA03caLBy//200hTnLPft28fxQwfQiGkFgkbI6afO8cjZc9xZv8XW+gYLScRQaXZ3djh++gRLSQNjLM0k4dTKCpv9Hp3WAmkc4Tx8ePlHvPJnf4mzDmYj+XJ7jlhLejdv8kd/8If82m99jWceP0uW5Wzf2UT83peeuCcN4mYKyRy7W1toa/DAbl5hEfzCb/wyN67d5Ifvvc9XvvrzeO/xs4k/CALWrq/xrT/95nR0j0O0ljjjEN5Nm1LtGFeW1U+dopEk9La7bG/eQfzuS+e9FNNRuK4NW4MRmYW5OORgq0FpHf1JRZI2qOuaurYkc02su6cWkEJS1zW2LEmk5ZGzj3Hhp77EX//x19lcW6OZNqmtwTkwpgbvmdQW40G9eGb1kp3JJyklUmukFMSBpp3GNIIAhCDPS3CQRAHaOZS3aG8IcShnUd4hbM35zz3Fp5/+DBv9PqsnH8ROJvS2tgiCYCrfQk0cTmlYCoE+tr/Dh5td6tIihaAZappRAN5zuL1AGGjK21sYq9FSEgUKiQDh8R4W51LyqiYrS1wg2d3pU4zGLC4vsv3RGuPhGCXVPXXlHDjhSEJNEmr0R3d7FMbOBKXA7akXDxu9XZSUGGtJAj0bPD0WDw48nt1JjnUe50AozdqVq/S7Ozxw8kGuffAB2SijRtIQAiXFPc3pZ8JT/PaL57ySEus8lbE0Qo0A3EyewXRq1kJSGIPznjQMsB6k8Fg31ZNKyqkQFQJjLTuDEQQBnTRmUtZoJWnGwZ4y+785Qs+aifdMcTCrBHiK2jAqDHJPa3uPmIlVJQX3L3U4stRBzc7vCVglJQWKUWGw1rKQRMSB+n/OAf4XHHhNTS+t6dgAAAAASUVORK5CYII='})();
+var BOTTLE=new Image();BOTTLE.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAeCAYAAADzXER0AAADrUlEQVR42nWT3YtVVRjGf++79j77nDPjNDpNWcyMJBlYJllEEd1Y0oUUgiCECAVd1v+gl0VddxFBeDEQRNRFiASBFGiCgtqHkWZpEqnHwY85X/vjfbvYe585M+mCDXuvtZ/1Puv3PkvcERH8/NcfrLtz/eR3lg2eVtV+YRbcCkTERFTcLAlJ6+zElld3bdv53rI7ohw6KAC5/TMXrP+8Z70mxWBabTjl2WBKPZ3GhlOW9Zpa9F+Iu1fmATh0UCKq0V0uGl4ImrQoCkODEDTGcXdzJFJ3iWS5p22AL576dUUc++00y+9S5CkhiiF3LM8JURBByIZDRCcQu5YD7Nv3pI/EN9bv3jE5cZFsOHBVFQ0NEMVwAKwovGi2ZCnZsgM+O8shEICjx07u375182KwvrVn5lUVujev0r/dQTSACAIImE5u1DO/XHh79ysvHY4A5ubm9mzc0Oavk1/ZzNReDckES1d+oNe5hIQYqpZYkdkTO9/VhYVNbwCluHPt38vp/CzR9GNy9fcfUQ3k0qL18HbcS9uigRC3JPWEpRuX/waIAL785uiHzVby5nPP7Jq/c7drKiiiNQ4EKMx9cqIdTp851/n++ImPAOTjxcX12x7f+vnWLZtfi4O641IVGwkdcDdU1bPc5LcLl46cv/LHfjl24vSnL7/47Dvd5a5FUdB2s8lyr0+WZWX0qNQ4DjTiyNrtth4/9dMnOrthw+vD/oAsyyRpNACIQsC91jhQAlMRhsNUBv0BM9NTeyJ3m3Z3RFWE8eGl6Wp2BZyK47jZOgXPEakqVOdcvcvK5GhBMLOg7iUUkSoGY3VL76X/0Yp79S4oELzmKnWRMlGMbTiyXUEUgUhV8tKN8z+34z2r7LhZDbFQd9e1/9zv8F61q+QoogaRr1HX12Ct9ZKNAoI7qkEklXviddZuWhKv18wjMwv3t1xXr4h4CU4QRMRUVeNRIMYCXX+ZeyWoC5e0zTyoO0Udf1+Tr7oDq4/lNTpTh2xVKFaUZb/vHTdwiFTEVKRkMI7VVztZqVmlTDVE4A3HCUHrXCEihBBWLvPYsKqE4BaZmZk5d7s9Ws2EhsakacbSrTvV1RydAXcnCko8NYm7iMZxou7uaZpZluUADNOMKARUdfQEFYIKRWEmIiTNRh5d73SObFp4dO/C3COephm9wYBGI2a2Oc29UhvHMXkBNzpL30bnTl18q98f/vzgzAMHmknyEBAAMbMavkdRMDNXcEvT7Gbn1u3Df54/+/5/lxfY/kYcGpgAAAAASUVORK5CYII=';
+var DUG=mk(T,T,function(x){x.fillStyle='#160E2A';x.fillRect(0,0,T,T);x.fillStyle='#1E1438';for(var i=0;i<5;i++)x.fillRect(irnd(16)*2,irnd(16)*2,2,2)});
+
+/* 研究員スプライト */
+var SPR=['....HHHH....','...HHHHHH...','...HSSSSH...','...GGSGGS...','...SSSSSS...','....SSSS....','..CCCCCCCC..','.CCCCPCCCCC.','.CC.CCCC.CC.','.SS.CCCC.SS.','....CCCC....','....N..N....','....N..N....','...BB..BB...'];
+var PCOL={H:'#1F2152',S:'#FFD2B0',G:'#FF5F8F',C:'#FFFFFF',P:'#0F8FA8',N:'#1F2152',B:'#5B3E8E'};
+function sprite(flip){return mk(24,28,function(x){SPR.forEach(function(r,j){for(var i=0;i<12;i++){var ch=r[flip?11-i:i];if(PCOL[ch]){x.fillStyle=PCOL[ch];x.fillRect(i*2,j*2,2,2)}}})})}
+var PL=[sprite(false),sprite(true)];
+
+/* コロニーの絵 */
+function drawColony(x,cx,cy,r,g,seed){
+  var G=GEN[g];var s=seed||1;function sr(){s=(s*9301+49297)%233280;return s/233280}
+  x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.arc(cx+1,cy+2,r,0,7);x.fill();
+  x.fillStyle=G.c;x.beginPath();x.arc(cx,cy,r,0,7);x.fill();
+  x.strokeStyle='rgba(0,0,0,.25)';x.lineWidth=Math.max(1,r/6);x.beginPath();x.arc(cx,cy,r*.62,0,7);x.stroke();
+  x.fillStyle='rgba(255,255,255,.85)';
+  for(var i=0;i<Math.round(r*1.2);i++){var a=sr()*6.28,d=sr()*r*.85,q=Math.max(1,Math.round(r/7));x.fillRect(Math.round(cx+Math.cos(a)*d),Math.round(cy+Math.sin(a)*d),q,q)}
+  if(G.m){x.fillStyle='#fff';for(var k=0;k<3;k++){var a2=k*2.1+.4;x.fillRect(Math.round(cx+Math.cos(a2)*(r+3)),Math.round(cy+Math.sin(a2)*(r+3)),2,2)}}
+}
+function colonyCanvas(g,size,locked){return mk(size,size,function(x){
+  x.fillStyle='rgba(205,239,247,.15)';x.beginPath();x.arc(size/2,size/2,size/2-1,0,7);x.fill();
+  x.strokeStyle='rgba(255,255,255,.6)';x.lineWidth=2;x.beginPath();x.arc(size/2,size/2,size/2-2,0,7);x.stroke();
+  if(locked){x.fillStyle='rgba(255,255,255,.35)';x.font=(size*.45)+'px "Press Start 2P",monospace';x.textAlign='center';x.textBaseline='middle';x.fillText('?',size/2,size/2+1);return}
+  drawColony(x,size/2,size/2,size*.3,g,g*17+3);
+})}
+
+function charImg(g,size,locked){var im=new Image();im.src=CHAR[g];im.width=size;im.height=size;im.alt=locked?'？？？':GEN[g].k;im.className='chara'+(locked?' lock':'');im.draggable=false;return im}
+
+/* ---------- ステージ生成 ---------- */
+var map,cols,pl,state='title',timeLeft,score,caught,newCount,cam=0,parts=[],floats=[],rings=[],pollenUntil=0,nextMove=0,held=null,tapDir=null,shake=0,slowUntil=0,cycloUntil=0,lastPing=0,strength=0,returnTo='title',runFound=[],overHTML='';
+function k(x,y){return y*COLS+x}
+function gen(){
+  map=[];var y,x;
+  for(y=0;y<ROWS;y++){var row=[];for(x=0;x<COLS;x++)row.push(1);
+    if(y>=2){var p=y<15?.07:.13,cnt=0;for(x=0;x<COLS;x++){if(Math.random()<p&&cnt<5){row[x]=2;cnt++}}}
+    map.push(row)}
+  function place(t,minY,n){var tries=0;while(n>0&&tries<500){tries++;var px=irnd(COLS),py=minY+irnd(ROWS-minY);if(map[py][px]===1){map[py][px]=t;n--}}}
+  place(3,5,7);place(4,12,4);
+  for(var li=0;li<4;li++){var by0=Math.max(2,li*15),bt=0;while(bt<500){bt++;var bx=irnd(COLS),byy=by0+irnd(15-(by0-li*15));if(map[byy][bx]===1){map[byy][bx]=5;break}}} // 小瓶(抗カビ剤)を各層に1つ
+  cols=new Map();var tries=0,need=LAYER_COUNT.slice(),n=need.reduce(function(a,b){return a+b},0);
+  while(cols.size<n&&tries<4000){tries++;
+    var li2=need.findIndex(function(v){return v>0});if(li2<0)break;
+    var cx=irnd(COLS),cy=Math.max(1,li2*15)+irnd(15-(li2===0?1:0));if(map[cy][cx]!==1||cols.has(k(cx,cy)))continue;
+    var open=[[1,0],[-1,0],[0,1],[0,-1]].some(function(d){var a=cx+d[0],b=cy+d[1];return a>=0&&a<COLS&&b>=0&&b<ROWS&&map[b][a]!==2});if(!open)continue;
+    var w=TIERW[layerOf(cy)],r=Math.random()*100,tier=1,acc=0;for(var i=0;i<4;i++){acc+=w[i];if(r<acc){tier=i+1;break}}
+    var pool=[];GEN.forEach(function(G,gi){if(G.t===tier)pool.push(gi)});
+    cols.set(k(cx,cy),{x:cx,y:cy,g:pool[irnd(pool.length)],found:false});need[li2]--;
+  }
+  if(Math.random()<SECRET_RATE){
+    var deep=[];cols.forEach(function(c){if(layerOf(c.y)>=2)deep.push(c)});
+    var sec=[];GEN.forEach(function(G,gi){if(G.t===5)sec.push(gi)});
+    if(deep.length&&sec.length)deep[irnd(deep.length)].g=sec[irnd(sec.length)];
+  }
+}
+function reset(){
+  gen();pl={x:4,y:-1,fx:4,fy:-1,face:1,mv:null,walk:0};
+  slowUntil=0;cycloUntil=0;timeLeft=TIME;score=0;caught=0;newCount=0;parts=[];floats=[];rings=[];pollenUntil=0;held=null;tapDir=null;runFound=[];
+  cam=0;floats.push({x:4.5,y:-.6,txt:'↓ 掘ってみよう',t:0,life:3200,col:'#FFF7DC'});
+}
+
+/* ---------- 移動・掘削 ---------- */
+function bump(){shake=6;sfx(90,.07,'square',.04)}
+function tryMove(dx,dy,now){
+  var nx=pl.x+dx,ny=pl.y+dy;if(dx)pl.face=dx>0?0:1;
+  if(nx<0||nx>=COLS||ny<-1||ny>=ROWS){bump();nextMove=now+140;return}
+  var dur=50; // 1マス移動にかかる基本時間(ms)。小さいほど速い
+  if(ny>=0){var t=map[ny][nx];
+    if(t===2){var prot=now<cycloUntil;bump();if(!prot)slowUntil=now+3000;map[ny][nx]=0;for(var i=0;i<10;i++)parts.push({x:(nx+.5)*T,y:(ny+SKY+.5)*T,vx:rnd(-70,70),vy:rnd(-90,-20),life:rnd(.3,.6),t:0,c:Math.random()<.5?'#8FA98A':'#E3D9B0'});floats.push({x:nx+.5,y:ny,txt:prot?'抗カビ剤が効いた！':'スロー！ 3秒',t:0,life:1300,col:prot?'#7FD6F0':'#8FD18A'});nextMove=now+160;return}
+    if(t!==0){dur+=LAY[layerOf(ny)].delay;dig(nx,ny);
+      if(t===3){timeLeft+=8;floats.push({x:nx+.5,y:ny,txt:'HV寒天 +8秒',t:0,life:1300,col:'#FFB23F'});jingle([659,880,1109],.06)}
+      if(t===4){pollenUntil=now+6000;floats.push({x:nx+.5,y:ny,txt:'花粉ベイト！',t:0,life:1300,col:'#FFE38A'});jingle([587,740,880,1175],.05,'triangle')}
+      if(t===5){cycloUntil=now+5000;slowUntil=0;floats.push({x:nx+.5,y:ny,txt:'抗カビ剤！ 5秒',t:0,life:1300,col:'#7FD6F0'});jingle([740,880,1109],.05,'triangle')}
+      map[ny][nx]=0}}
+  if(now<slowUntil)dur*=3.5; // 障害物にふれた後の3秒間は、移動がかなり遅くなる(通常の約1/3.5の速さ)
+  pl.mv={x0:pl.x,y0:pl.y,x:nx,y:ny,t0:now,dur:dur};pl.x=nx;pl.y=ny;nextMove=now+dur;
+}
+function dig(x,y){var L=LAY[layerOf(y)];sfx(140+irnd(60),.05,'square',.025);
+  for(var i=0;i<7;i++)parts.push({x:(x+.5)*T,y:(y+SKY+.5)*T,vx:rnd(-60,60),vy:rnd(-90,-20),life:rnd(.3,.6),t:0,c:Math.random()<.5?L.sp:L.c2})}
+function arrive(now){
+  var c=cols.get(k(pl.x,pl.y));
+  if(c&&!c.found){c.found=true;found(c,now)}
+}
+
+/* ---------- 発見 → 解析 ---------- */
+function found(c,now){
+  state='modal';held=null;
+  var G=GEN[c.g],L=layerOf(c.y),newSp=G.t>=3&&Math.random()<(L>=3?.35:.25);
+  var pts=PTS[G.t]+(newSp?NEWPTS:0);score+=pts;caught++;if(newSp)newCount++;
+  save.found[G.n]=(save.found[G.n]||0)+1;if(newSp)save.newSp++;persist();runFound.push(c.g);
+  for(var i=0;i<16;i++)parts.push({x:(c.x+.5)*T,y:(c.y+SKY+.5)*T,vx:rnd(-120,120),vy:rnd(-140,40),life:rnd(.4,.8),t:0,c:G.c});
+  jingle([784,988,1175],.05);
+  panel.innerHTML='<p class="kicker">ANALYZING...</p><div id="cslot" class="cslot-anim"></div>'+
+    '<p class="steps"><span id="s1" class="on">分離</span> → <span id="s2">純粋培養</span> → <span id="s3">DNA解析</span></p><div class="bar"><i></i></div>';
+  $('cslot').appendChild(charImg(c.g,96,true));
+  openOv();
+  setTimeout(function(){var e=$('s2');e&&e.classList.add('on');sfx(500,.05)},400);
+  setTimeout(function(){var e=$('s3');e&&e.classList.add('on');sfx(620,.05)},800);
+  setTimeout(function(){
+    if(state!=='modal')return;
+    var homo=(96.5+Math.random()*1.9).toFixed(1);
+    var isSec=G.t===5;
+    panel.innerHTML='<p class="kicker'+(isSec?' secret':'')+'">'+(isSec?'★ SECRET CHARACTER ★':'ISOLATED!')+'</p>'+
+      (newSp?'<p class="nsp-title" aria-label="新種候補"><span>N</span><span>E</span><span>W</span> <span>S</span><span>P</span><span>E</span><span>C</span><span>I</span><span>E</span><span>S</span><span>!</span><span>?</span></p>':'')+
+      '<div class="'+(newSp?'nsp-burst':'')+'"><div id="cslot"'+(isSec?' class="secret-glow"':'')+'></div></div>'+
+      '<p class="gname">'+G.n+'</p><p class="kana">'+G.k+'</p><p class="stars" aria-label="レア度'+G.t+'">'+STARS(G.t)+'</p>'+
+      (newSp?'<p class="newsp stamp">16S rRNA遺伝子の相同性 '+homo+'%<br>既知の種と大きく違う → 新種候補！</p>':'')+
+      '<p class="desc">'+G.d+'</p><p class="pts">+'+pts+'</p>'+
+      '<div class="btns"><button class="btn" data-act="resume">つづける</button></div>';
+    $('cslot').appendChild(charImg(c.g,96,false));
+    if(isSec)jingle([523,659,784,1046,784,1046,1318,1568,2093],.08);else if(newSp)jingle([587,740,880,1175,1480,1760],.07);else jingle([880,1318],.08,'triangle');
+    if(newSp)newSpeciesFx();
+    focusFirst();
+  },1250);
+}
+
+/* ---------- 新種候補の特別エフェクト ---------- */
+var reduceMotion=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function newSpeciesFx(){
+  var game=$('game');
+  setTimeout(function(){sfx(130,.5,'sawtooth',.05,65);jingle([1047,1319,1568,2093],.05,'triangle')},420);
+  if(reduceMotion)return;
+  /* 画面フラッシュ＋ゆれ */
+  var fl=document.createElement('div');fl.className='ov-flash';game.appendChild(fl);setTimeout(function(){fl.remove()},600);
+  game.classList.remove('quake');void game.offsetWidth;game.classList.add('quake');setTimeout(function(){game.classList.remove('quake')},500);
+  /* 紙吹雪（ドット） */
+  var c=document.createElement('canvas');c.className='fx';var W=160,H=Math.round(160*game.clientHeight/Math.max(1,game.clientWidth));c.width=W;c.height=H;game.appendChild(c);
+  var x=c.getContext('2d'),cols=['#FF5F8F','#FFB23F','#FFE38A','#38D0E8','#7CE0B5','#C59BFF','#FFFFFF'],ps=[],t0=performance.now();
+  for(var i=0;i<90;i++)ps.push({x:Math.random()*W,y:-Math.random()*H*.6,vx:(Math.random()-.5)*20,vy:20+Math.random()*40,c:cols[i%cols.length],w:1+(Math.random()<.4?1:0),ph:Math.random()*6});
+  for(var j=0;j<24;j++){var a=Math.random()*6.28,v=40+Math.random()*60;ps.push({x:W/2,y:H*.32,vx:Math.cos(a)*v,vy:Math.sin(a)*v-30,c:cols[j%cols.length],w:2,ph:0,burst:1})}
+  var last=t0;
+  (function step(now){var dt=Math.min(.05,(now-last)/1000);last=now;var age=now-t0;x.clearRect(0,0,W,H);
+    ps.forEach(function(p){p.vy+=(p.burst?90:25)*dt;p.x+=(p.vx+Math.sin(now/200+p.ph)*8)*dt;p.y+=p.vy*dt;
+      x.globalAlpha=age>2600?Math.max(0,1-(age-2600)/600):1;x.fillStyle=p.c;x.fillRect(Math.round(p.x),Math.round(p.y),p.w,Math.random()<.15?1:p.w)});
+    if(age<3200&&c.isConnected)requestAnimationFrame(step);else c.remove()})(t0);
+}
+
+/* ---------- 画面（オーバーレイ） ---------- */
+function openOv(){ov.classList.add('on')}
+function closeOv(){ov.classList.remove('on');panel.innerHTML=''}
+function focusFirst(){var b=panel.querySelector('.btn');if(b)try{b.focus({preventScroll:true})}catch(e){b.focus()}}
+function showTitle(){
+  state='title';returnTo='title';
+  panel.innerHTML='<p class="kicker">YAMANASHI UNIV. APPLIED MICROBIOLOGY LAB.</p><h1 class="title">SOIL<br>HUNTER</h1><p class="sub">ソイル・ハンター</p>'+
+   '<p class="story">あなたは応用微生物学研究室の新人研究員。<br>この土のどこかに、まだ誰も見たことのない放線菌が眠っている――。<br>レーダーを頼りに土を掘り、<b>'+TIME+'秒</b>でできるだけ多くの放線菌を採取しよう！</p>'+
+   '<div class="btns"><button class="btn" data-act="start">▶ START</button><button class="btn alt" data-act="zukan">図鑑</button><button class="btn ghost" data-act="howto">遊び方</button></div>'+
+   (save.best?'<p class="hi">HIGH SCORE '+save.best+'</p>':'');
+  openOv();focusFirst();
+}
+function showHow(){
+  panel.innerHTML='<p class="kicker">HOW TO PLAY</p><ul class="howto">'+
+   '<li><b>移動・掘る</b>：矢印キー／WASD、画面下のボタン、または画面をタップした方向へ。</li>'+
+   '<li><b>レーダー</b>：右上のバーが多いほど、放線菌が近くにいます。研究員のまわりの輪が速く光るのも合図。</li>'+
+   '<li><b>カビのコロニー</b>はふれると消えますが、3秒間、動きがかなり遅くなります。かたい土は掘るのに時間がかかります。</li>'+
+   '<li><b>HV寒天</b>（シャーレ）：制限時間 +8秒。</li>'+
+   '<li><b>花粉ベイト</b>（黄色い粒）：6秒間、まわりの放線菌が光って見えます。</li>'+
+   '<li><b>小瓶</b>（各層に1つ）：中身は抗カビ剤のシクロヘキシミド。取ると5秒間、カビのコロニーにふれても動きが遅くなりません。</li>'+
+   '<li>放線菌がいちばん多くすんでいるのは<b>腐植層</b>。それより下の層ほど数は少なくなりますが、深く掘るほど希少な放線菌が見つかりやすくなります（希少さはゲーム上の設定）。</li>'+
+   '<li>見つけた放線菌は<b>図鑑</b>に登録されます。新種候補が出たら大当たり！</li><li>粘土層より深いところに、ごくまれに<b>シークレット</b>の放線菌がひそんでいるらしい……。</li></ul>'+
+   '<div class="btns"><button class="btn" data-act="start">▶ START</button><button class="btn ghost" data-act="back">もどる</button></div>';
+  openOv();focusFirst();
+}
+function showZukan(){
+  var normal=[],secret=[];GEN.forEach(function(G,i){(G.t===5?secret:normal).push(i)});
+  var have=normal.filter(function(i){return got(i)>0}).length,haveS=secret.filter(function(i){return got(i)>0}).length;
+  var h='<p class="kicker">ACTINO ZUKAN '+have+'/'+normal.length+'　SECRET '+haveS+'/'+secret.length+'</p><div class="zdetail" id="zd">'+(have+haveS?'カードを選ぶと説明が出ます。':'まだ1株も見つけていません。土を掘ってみよう！')+'</div><div class="zgrid" id="zg"></div>'+
+    '<p style="font-size:13px;margin:8px 0 0">見つけた新種候補：累計 <b style="color:#FF5F8F">'+save.newSp+'</b> 株</p>'+
+    '<div class="btns"><button class="btn ghost" data-act="back">もどる</button></div>';
+  panel.innerHTML=h;var zg=$('zg');
+  normal.concat(secret).forEach(function(i){var G=GEN[i],n=got(i),isSec=G.t===5;var b=document.createElement('button');b.type='button';b.className='zc'+(n?'':' lock')+(isSec?' sec':'');
+    if(isSec&&!n){var q=document.createElement('span');q.className='zq';q.textContent='?';b.appendChild(q)}else b.appendChild(charImg(i,40,!n));
+    var nm=document.createElement('span');nm.className='zn';nm.textContent=n?G.n:(isSec?'SECRET':'？？？');b.appendChild(nm);
+    var st=document.createElement('span');st.className='zs';st.textContent=STARS(G.t)+(n?' ×'+n:'');b.appendChild(st);
+    if(n)b.addEventListener('click',function(){$('zd').innerHTML='<b>'+G.k+'</b>：'+G.d});else b.disabled=true;
+    zg.appendChild(b)});
+  openOv();focusFirst();
+}
+function rankOf(){if(runFound.some(function(g){return GEN[g].t===5}))return '幻の放線菌ハンター';if(newCount>=2||score>=6000)return '新種ハンター';if(newCount>=1||score>=3000)return '分離の名人';if(score>=1200)return '一人前の研究員';return '見習い研究員'}
+function endGame(){
+  state='over';returnTo='over';held=null;
+  var rec=score>save.best;if(rec){save.best=score;persist()}
+  jingle([880,740,587,440],.12,'triangle');
+  var uniq=runFound.filter(function(g,i){return runFound.indexOf(g)===i});
+  var txt='SOIL HUNTERで放線菌を'+caught+'株採取！'+(newCount?'新種候補'+newCount+'株！':'')+' SCORE '+score+'（称号：'+rankOf()+'）';
+  var url='https://twitter.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(location.href.split('#')[0])+'&hashtags='+encodeURIComponent('山梨大学,放線菌');
+  setTimeout(function(){
+    overHTML='<p class="kicker">TIME UP!</p><p class="big">SCORE '+score+'</p>'+(rec?'<p class="newsp" style="font-family:var(--pix);font-size:11px">NEW RECORD!</p>':'')+
+      '<p style="margin:4px 0">採取した放線菌 <b>'+caught+'</b> 株／新種候補 <b style="color:#FF5F8F">'+newCount+'</b> 株</p>'+
+      '<p class="rank">称号：<b>'+rankOf()+'</b></p>'+
+      (uniq.length?'<div class="chips">'+uniq.map(function(g){return '<span>'+GEN[g].n+'</span>'}).join('')+'</div>':'<p style="font-size:13px">レーダーのバーが多い方へ掘り進めてみよう。</p>')+
+      '<div class="btns"><button class="btn" data-act="start">もう一度</button><button class="btn alt" data-act="zukan">図鑑</button></div>'+
+      '<div class="btns"><a class="btn ghost" href="../../research/isolation/">研究内容を読む</a><a class="btn ghost" href="'+url+'" target="_blank" rel="noopener">Xでシェア</a></div>';
+    panel.innerHTML=overHTML;openOv();focusFirst();
+  },700);
+}
+function start(){bgmStep=0;bgmNext=null;initAudio();if(ac&&ac.state==='suspended')ac.resume();reset();closeOv();state='play';jingle([587,880,1175],.07);try{cv.focus({preventScroll:true})}catch(e){}}
+panel.addEventListener('click',function(e){var b=e.target.closest('[data-act]');if(!b)return;var a=b.dataset.act;
+  if(a==='start')start();else if(a==='zukan')showZukan();else if(a==='howto')showHow();
+  else if(a==='back'){returnTo==='over'?endGameBack():showTitle()}
+  else if(a==='resume'){closeOv();state='play'}});
+function endGameBack(){panel.innerHTML=overHTML;openOv();focusFirst()}
+
+/* ---------- 入力 ---------- */
+var KEYS={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],a:[-1,0],d:[1,0],w:[0,-1],s:[0,1],A:[-1,0],D:[1,0],W:[0,-1],S:[0,1]};
+document.addEventListener('keydown',function(e){
+  var d=KEYS[e.key];
+  if(state==='play'){if(d){held=d;e.preventDefault()}else if(e.key==='Escape'){}}
+  else if(d&&e.target===document.body)e.preventDefault();
+  if(state==='modal'&&(e.key===' '||e.key==='Enter')){var b=panel.querySelector('[data-act="resume"]');if(b){e.preventDefault();b.click()}}
+});
+document.addEventListener('keyup',function(e){var d=KEYS[e.key];if(d&&held&&held[0]===d[0]&&held[1]===d[1])held=null});
+window.addEventListener('blur',function(){held=null});
+Array.prototype.forEach.call(document.querySelectorAll('#pad button'),function(b){
+  var d=b.dataset.d.split(',').map(Number);
+  b.addEventListener('pointerdown',function(e){e.preventDefault();if(state==='play'){held=d;tapDir=d}b.classList.add('on');try{b.setPointerCapture(e.pointerId)}catch(_){}} );
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){b.addEventListener(ev,function(){if(held===d)held=null;b.classList.remove('on')})});
+  b.addEventListener('contextmenu',function(e){e.preventDefault()});
+});
+cv.addEventListener('pointerdown',function(e){
+  if(state!=='play')return;e.preventDefault();
+  var r=cv.getBoundingClientRect(),sx=(e.clientX-r.left)/r.width*cv.width,sy=(e.clientY-r.top)/r.height*cv.height;
+  var wx=sx/T,wy=(sy+cam)/T-SKY,dx=wx-(pl.x+.5),dy=wy-(pl.y+.5);
+  if(Math.abs(dx)<.5&&Math.abs(dy)<.5)return;
+  tapDir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1];
+});
+document.addEventListener('visibilitychange',function(){if(document.hidden)held=null});
+
+/* ---------- ループ ---------- */
+var last=performance.now();
+function update(dt,now){
+  if(state==='play'&&!document.hidden){timeLeft-=dt;if(timeLeft<=0){timeLeft=0;endGame()}}
+  if(pl.mv){var q=(now-pl.mv.t0)/pl.mv.dur;if(q>=1){pl.fx=pl.mv.x;pl.fy=pl.mv.y;pl.mv=null;pl.walk++;if(state==='play')arrive(now)}
+    else{pl.fx=pl.mv.x0+(pl.mv.x-pl.mv.x0)*q;pl.fy=pl.mv.y0+(pl.mv.y-pl.mv.y0)*q}}
+  if(state==='play'&&!pl.mv&&now>=nextMove){var d=tapDir||held;if(d){tapDir=null;tryMove(d[0],d[1],now)}}
+  /* レーダー */
+  var best=99;cols.forEach(function(c){if(!c.found){var m=Math.abs(c.x-pl.x)+Math.abs(c.y-pl.y);if(m<best)best=m}});
+  strength=best<=5?6-best:0;
+  if(state==='play'&&strength>0&&now-lastPing>1500-strength*230){lastPing=now;rings.push({t0:now});sfx(700+strength*90,.05,'sine',.03)}
+  rings=rings.filter(function(r){return now-r.t0<700});
+  parts.forEach(function(p){p.t+=dt;p.vy+=300*dt;p.x+=p.vx*dt;p.y+=p.vy*dt});parts=parts.filter(function(p){return p.t<p.life});
+  floats.forEach(function(f){f.t+=dt*1000});floats=floats.filter(function(f){return f.t<f.life});
+  var target=(pl.fy+SKY)*T-5*T,maxC=(ROWS+SKY-VR)*T;target=Math.max(0,Math.min(maxC,target));cam+=(target-cam)*Math.min(1,dt*8);
+  if(shake>0)shake=Math.max(0,shake-dt*40);
+  hud();
+}
+var hv={};
+function setT(id,v){if(hv[id]!==v){hv[id]=v;$(id).textContent=v}}
+function hud(){
+  setT('vTime',Math.ceil(timeLeft));setT('vScore',score);setT('vDepth',Math.max(0,pl.y+1)*2+'cm');
+  $('hTime').className=timeLeft<=10&&state==='play'?'t-low':'';
+  if(hv.bars!==strength){hv.bars=strength;Array.prototype.forEach.call($('vBars').children,function(b,i){b.classList.toggle('on',i<strength)})}
+}
+function sy(y){return (y+SKY)*T-cam}
+function draw(now){
+  ctx.save();if(shake)ctx.translate(Math.round(rnd(-shake,shake)/2)*2,0);
+  ctx.fillStyle='#000';ctx.fillRect(-8,0,cv.width+16,cv.height);
+  /* 空と街 */
+  var top=sy(-SKY),g=ctx.createLinearGradient(0,top,0,top+SKY*T);
+  g.addColorStop(0,'#1F2152');g.addColorStop(.45,'#5B3E8E');g.addColorStop(.8,'#FF5F8F');g.addColorStop(1,'#FFB23F');
+  ctx.fillStyle=g;ctx.fillRect(0,top,cv.width,SKY*T);
+  if(top+SKY*T>0){
+    ctx.fillStyle='#fff';[[30,12],[90,30],[250,18],[300,44],[170,8]].forEach(function(s){ctx.fillRect(s[0],top+s[1],2,2)});
+    ctx.fillStyle='#FFE38A';ctx.beginPath();ctx.arc(250,top+70,18,0,7);ctx.fill();
+    ctx.fillStyle='#3F2A6E';ctx.beginPath();ctx.moveTo(40,top+SKY*T);ctx.lineTo(130,top+64);ctx.lineTo(150,top+64);ctx.lineTo(240,top+SKY*T);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(130,top+64);ctx.lineTo(150,top+64);ctx.lineTo(160,top+76);ctx.lineTo(120,top+76);ctx.fill();
+    ctx.fillStyle='#1A1850';[[0,96,26],[28,104,20],[246,90,30],[278,100,20],[300,94,20]].forEach(function(b){ctx.fillRect(b[0],top+b[1],b[2],SKY*T-b[1])});
+    ctx.fillStyle='#FFB23F';[[8,104],[36,112],[254,98],[262,110],[284,108],[306,102]].forEach(function(w){ctx.fillRect(w[0],top+w[1],4,4)});
+    ctx.fillStyle='#0F8FA8';ctx.fillRect(0,sy(0)-4,cv.width,4);
+  }
+  /* 土 */
+  var y0=Math.max(0,Math.floor(cam/T)-SKY),y1=Math.min(ROWS-1,y0+VR+1);
+  for(var y=y0;y<=y1;y++){var L=layerOf(y),py=sy(y);for(var x=0;x<COLS;x++){var t=map[y][x],px=x*T;
+    if(t===0)ctx.drawImage(DUG,px,py);else if(t===2)ctx.drawImage(ROCK,px,py);
+    else{ctx.drawImage(TEX[L][(x*7+y*13)%3],px,py);
+      if(t===3){ctx.fillStyle='#CDEFF7';ctx.fillRect(px+6,py+10,20,12);ctx.fillStyle='#FFB23F';ctx.fillRect(px+8,py+12,16,8);ctx.fillStyle='#fff';ctx.fillRect(px+6,py+10,20,2);ctx.fillStyle='#7A3F20';ctx.fillRect(px+12,py+14,3,3);ctx.fillRect(px+18,py+15,2,2)}
+      if(t===5&&BOTTLE.complete&&BOTTLE.naturalWidth)ctx.drawImage(BOTTLE,px+Math.round((T-BOTTLE.naturalWidth)/2),py+1);
+      if(t===4){ctx.fillStyle='#FFE38A';ctx.fillRect(px+12,py+10,8,12);ctx.fillRect(px+10,py+12,12,8);ctx.fillStyle='#FFB23F';ctx.fillRect(px+14,py+8,4,2);ctx.fillRect(px+14,py+22,4,2);ctx.fillRect(px+8,py+14,2,4);ctx.fillRect(px+22,py+14,2,4);ctx.fillStyle='#fff';ctx.fillRect(px+13,py+12,2,2)}
+    }}
+    if(y%15===0){ctx.fillStyle='rgba(11,13,48,.75)';ctx.fillRect(0,py+2,52,14);ctx.fillStyle='#CDEFF7';ctx.font='10px "DotGothic16",monospace';ctx.textBaseline='top';ctx.fillText(LAY[L].name,4,py+3)}
+  }
+  /* 花粉ベイトで見える放線菌 */
+  if(now<pollenUntil){cols.forEach(function(c){if(c.found)return;if(Math.abs(c.x-pl.x)+Math.abs(c.y-pl.y)>5)return;
+    var a=.55+.45*Math.sin(now/120+c.x);ctx.globalAlpha=a;drawColony(ctx,(c.x+.5)*T,sy(c.y)+T/2,8,c.g,c.x*31+c.y);ctx.globalAlpha=1;
+    ctx.strokeStyle='#FFE38A';ctx.lineWidth=2;ctx.strokeRect(c.x*T+2,sy(c.y)+2,T-4,T-4)})}
+  /* レーダーの輪 */
+  var cx=(pl.fx+.5)*T,cy=sy(pl.fy)+T/2;
+  rings.forEach(function(r){var q=(now-r.t0)/700;ctx.strokeStyle='rgba(255,95,143,'+(1-q)+')';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,12+q*40,0,7);ctx.stroke()});
+  /* 研究員 */
+  var bob=pl.mv?(Math.floor(now/80)%2)*2:0;
+  ctx.drawImage(PL[pl.face],Math.round(pl.fx*T+4),Math.round(sy(pl.fy)+2-bob));
+  parts.forEach(function(p){ctx.fillStyle=p.c;ctx.fillRect(Math.round(p.x),Math.round(p.y-cam),3,3)});
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='12px "DotGothic16",monospace';
+  floats.forEach(function(f){var q=f.t/f.life;ctx.globalAlpha=1-Math.max(0,q-.6)/.4;var fx=Math.max(56,Math.min(cv.width-56,f.x*T)),fy=sy(f.y)-q*24;
+    ctx.fillStyle='#000';ctx.fillText(f.txt,fx+1,fy+1);ctx.fillStyle=f.col;ctx.fillText(f.txt,fx,fy);ctx.globalAlpha=1});
+  ctx.textAlign='left';
+  if(state==='play'&&timeLeft<=10&&Math.floor(now/250)%2){ctx.strokeStyle='#FF5F8F';ctx.lineWidth=4;ctx.strokeRect(2,2,cv.width-4,cv.height-4)}
+  ctx.restore();
+  if(state==='play'||state==='modal'){ // 深く掘っても残り時間が見えるよう、画面上部にも表示
+    var low=timeLeft<=10,tx='TIME '+Math.ceil(timeLeft);
+    ctx.font='16px "DotGothic16",monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    var tw=ctx.measureText(tx).width+18;ctx.fillStyle='rgba(11,13,48,.78)';ctx.fillRect(cv.width/2-tw/2,4,tw,24);
+    ctx.fillStyle=low?'#FF5F8F':'#FFB23F';ctx.fillText(tx,cv.width/2,16);
+    if(now<cycloUntil){var ct='抗カビ '+Math.ceil((cycloUntil-now)/1000);ctx.font='12px "DotGothic16",monospace';var cw2=ctx.measureText(ct).width+14;ctx.fillStyle='rgba(11,13,48,.78)';ctx.fillRect(cv.width/2-cw2/2,30,cw2,18);ctx.fillStyle='#7FD6F0';ctx.fillText(ct,cv.width/2,40)}
+    else if(now<slowUntil){var st='SLOW '+Math.ceil((slowUntil-now)/1000);ctx.font='12px "DotGothic16",monospace';var sw=ctx.measureText(st).width+14;ctx.fillStyle='rgba(11,13,48,.78)';ctx.fillRect(cv.width/2-sw/2,30,sw,18);ctx.fillStyle='#8FD18A';ctx.fillText(st,cv.width/2,40)}
+    ctx.textAlign='left';
+  }
+}
+function loop(now){var dt=Math.min(.05,(now-last)/1000);last=now;update(dt,now);draw(now);requestAnimationFrame(loop)}
+reset();showTitle();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

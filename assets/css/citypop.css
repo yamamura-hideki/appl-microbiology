@@ -256,3 +256,22 @@
 
 .f-ga{flex:1 1 100%;font-size:.78rem}
 .para-gap{display:block;height:.9em}
+
+/* --- mini games --- */
+.cp-game{color:#fff;padding:64px 0;background:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(120deg,var(--navy) 0%,var(--violet) 100%)}
+.cp-game .cp-sec-head h2{font-family:var(--f-disp);font-weight:400;font-size:clamp(1.6rem,3.2vw,2.3rem);margin:.15em 0 0;letter-spacing:.02em}
+.game-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.game-card{display:flex;gap:18px;align-items:flex-start;color:#fff;text-decoration:none;background:rgba(11,13,48,.55);border:3px solid #fff;padding:18px;box-shadow:6px 6px 0 var(--pink);transition:transform .15s,box-shadow .15s}
+.game-card:nth-child(2){box-shadow:6px 6px 0 var(--lagoon)}
+.game-card:hover{opacity:1;transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--mango)}
+.game-pic{display:block;flex:none;image-rendering:pixelated;border:3px solid #fff}
+.gc-body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.gc-tag{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.12em;color:var(--sky)}
+.gc-body strong{font-family:var(--f-disp);font-weight:400;font-size:1.35rem;letter-spacing:.05em;line-height:1.25}
+.gc-body strong small{display:block;font-size:.6em;letter-spacing:.25em;color:var(--mango);margin-top:2px}
+.gc-body span{font-size:.92rem;line-height:1.7}
+.gc-play{align-self:flex-start;margin-top:4px;background:#fff;color:var(--navy);font-weight:700;padding:.35em 1em;border-radius:999px;font-size:.88rem!important}
+.game-list.single{grid-template-columns:minmax(0,720px)}
+.game-list.single .game-pic{width:120px;height:120px}
+@media(max-width:860px){.game-list{grid-template-columns:1fr}}
+@media(max-width:480px){.game-card{flex-direction:column;align-items:center;text-align:center}.gc-play{align-self:center}}
