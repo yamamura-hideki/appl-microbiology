@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ZOOSPORE RUN ズースポア・ラン｜山梨大学 応用微生物学研究室</title>
+<meta name="description" content="泳ぐ胞子（遊走子）になって、化学物質のにおいをたどり捕集口まで泳ぎきるレトロミニゲーム。山梨大学 応用微生物学研究室の「運動性放線菌の分離法」をもとにしています。">
+<meta property="og:title" content="ZOOSPORE RUN ズースポア・ラン">
+<meta property="og:description" content="においをたどって泳げ！ 60秒で捕集口までたどり着けるか？">
+<meta name="theme-color" content="#0B0D30">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1F2152;--lagoon:#0F8FA8;--pink:#FF5F8F;--mango:#FFB23F;--sky:#CDEFF7;--violet:#5B3E8E;--ink:#0B0D30;--cream:#FFF7DC;--pix:"Press Start 2P",monospace;--dot:"DotGothic16",monospace}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;color:#fff;font-family:var(--dot);line-height:1.7;
+  background:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px) 0 0/16px 16px,
+             linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/16px 16px,
+             radial-gradient(900px 500px at 50% 0%,rgba(56,208,232,.2),transparent 60%),var(--ink)}
+a{color:var(--sky)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;max-width:1000px;margin:0 auto;padding:12px 16px}
+.top a{text-decoration:none;font-size:14px}
+.top .logo{font-family:var(--pix);font-size:11px;color:var(--mango);letter-spacing:.1em}
+main{max-width:1000px;margin:0 auto;padding:4px 16px 48px;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:40px;align-items:start}
+.game{position:relative;width:100%;max-width:440px;margin:0 auto;user-select:none;-webkit-user-select:none}
+.hud{display:grid;grid-template-columns:1fr 1.1fr 1.3fr 1fr;gap:4px;background:var(--navy);border:3px solid #fff;border-bottom:0;padding:6px 8px;font-size:11px;line-height:1.3}
+.hud b{display:block;font-family:var(--pix);font-size:11px;color:var(--mango);margin-top:3px;white-space:nowrap}
+.hud .t-low b{color:var(--pink)}
+.meter{height:9px;margin-top:4px;background:rgba(255,255,255,.15);position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--pink);box-shadow:0 0 6px var(--pink)}
+.hearts{color:var(--pink);font-size:13px;letter-spacing:1px;margin-top:2px;display:block}
+.prog{height:6px;background:var(--navy);border:3px solid #fff;border-top:0;border-bottom:0;position:relative}
+.prog i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--lagoon),var(--mango))}
+canvas#cv{display:block;width:100%;aspect-ratio:320/416;image-rendering:pixelated;image-rendering:crisp-edges;background:#000;border:3px solid #fff;touch-action:none;cursor:pointer}
+.overlay{position:absolute;inset:0;display:none;align-items:flex-start;justify-content:center;background:rgba(11,13,48,.92);padding:14px;text-align:center;z-index:5;overflow:auto}
+.overlay.on{display:flex}
+.panel{width:100%;max-width:360px;margin:auto 0}
+.kicker{font-family:var(--pix);font-size:10px;color:var(--sky);letter-spacing:.12em;margin:0 0 8px}
+.title{font-family:var(--pix);font-size:26px;line-height:1.3;margin:4px 0;color:var(--mango);text-shadow:4px 4px 0 var(--lagoon),8px 8px 0 var(--violet)}
+.sub{margin:8px 0 10px;font-size:18px;letter-spacing:.2em}
+.story{font-size:13.5px;text-align:left;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.25);padding:10px 12px;margin:0 0 10px}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px}
+.btn{font-family:var(--dot);font-size:16px;border:3px solid #fff;background:var(--pink);color:#fff;padding:8px 16px;cursor:pointer;box-shadow:4px 4px 0 #000;text-decoration:none;display:inline-block;line-height:1.4}
+.btn.alt{background:var(--lagoon)}
+.btn.ghost{background:transparent}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+.btn:focus-visible,.pick:focus-visible{outline:3px solid var(--mango);outline-offset:2px}
+.picks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:6px 0}
+.pick{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.3);color:#fff;padding:6px 2px;cursor:pointer;font:inherit}
+.pick.on{border-color:var(--mango);background:rgba(255,178,63,.15);box-shadow:3px 3px 0 var(--mango)}
+.pick img{width:48px;height:48px;image-rendering:pixelated;display:block;margin:0 auto}
+.pick .pn{display:block;font-family:Georgia,serif;font-style:italic;font-size:9.5px;line-height:1.2;word-break:break-all;min-height:2.4em}
+.pick .pt{display:block;font-size:11px;color:var(--mango)}
+.stat{font-size:12px;text-align:left;background:rgba(0,0,0,.25);padding:6px 8px;min-height:3.4em}
+.hi{font-family:var(--pix);font-size:9px;color:var(--mango);margin:12px 0 0}
+.howto{text-align:left;font-size:13px;padding-left:1.2em;margin:8px 0}
+.howto li{margin:4px 0}
+.chara{display:block;margin:4px auto;width:96px;height:96px;image-rendering:pixelated}
+.gname{font-family:Georgia,serif;font-style:italic;font-size:22px;margin:2px 0 0;color:var(--cream)}
+.kana{margin:0;font-size:13px;color:var(--sky)}
+.desc{font-size:13px;text-align:left;background:rgba(255,255,255,.06);padding:8px 10px;margin:8px 0}
+.big{font-family:var(--pix);font-size:18px;color:var(--mango);margin:8px 0}
+.breakdown{font-size:13px;margin:4px 0}
+.rank b{color:var(--pink);font-size:18px}
+.pad{display:none;grid-template-columns:repeat(2,96px);gap:16px;justify-content:center;margin-top:14px}
+.pad button{font-family:var(--pix);font-size:18px;height:60px;background:var(--navy);color:#fff;border:3px solid #fff;box-shadow:3px 3px 0 #000;touch-action:none}
+.pad button.on{background:var(--pink);transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+@media (hover:none),(pointer:coarse){.pad{display:grid}}
+.tools{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:rgba(255,255,255,.7)}
+.tools button{font:inherit;color:#fff;background:transparent;border:2px solid rgba(255,255,255,.4);padding:2px 10px;cursor:pointer}
+.side h2{font-family:var(--pix);font-size:13px;color:var(--mango);line-height:1.6;margin:0 0 10px}
+.side section{border:3px solid rgba(255,255,255,.85);background:rgba(31,33,82,.7);padding:16px 18px;margin-bottom:18px;box-shadow:6px 6px 0 var(--lagoon)}
+.side p{font-size:14px;margin:0 0 10px}
+.side ul{margin:0;padding-left:1.2em;font-size:14px}
+.side li{margin:6px 0}
+.side .note{font-size:12px;color:rgba(255,255,255,.65)}
+@media (max-width:820px){main{grid-template-columns:1fr;gap:28px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a href="../../">← 応用微生物学研究室</a>
+  <span class="logo">ZOOSPORE RUN</span>
+</header>
+
+<main>
+  <div>
+    <div class="game" id="game">
+      <div class="hud" aria-live="off">
+        <div id="hTime">TIME<b id="vTime">60</b></div>
+        <div>SCORE<b id="vScore">0</b></div>
+        <div>におい<div class="meter"><i id="vSmell"></i></div></div>
+        <div>LIFE<span class="hearts" id="vHp">♥♥♥</span></div>
+      </div>
+      <div class="prog" title="捕集口までの道のり"><i id="vProg"></i></div>
+      <canvas id="cv" aria-label="ゲーム画面：水の中を泳ぐ遊走子"></canvas>
+      <div class="overlay on" id="ov" role="dialog" aria-modal="true"><div class="panel" id="panel"></div></div>
+    </div>
+    <div class="pad" id="pad" aria-label="移動ボタン">
+      <button data-d="-1" aria-label="左">◀</button>
+      <button data-d="1" aria-label="右">▶</button>
+    </div>
+    <div class="tools">
+      <span>操作：← →／A D・画面をタッチした方向へ</span>
+      <button type="button" id="mute" aria-pressed="false">♪ 音 ON</button>
+    </div>
+  </div>
+
+  <aside class="side">
+    <section>
+      <h2>このゲームについて</h2>
+      <p>放線菌のなかには、胞子が鞭毛で水の中を泳ぐ<strong>運動性放線菌</strong>がいます。乾かした土に液体を注ぐと、胞子のうから泳ぐ胞子（<strong>遊走子</strong>）が泳ぎ出します。</p>
+      <p>遊走子は、γ-コリジンなどの化学物質に引き寄せられて泳ぐ性質（<strong>走化性</strong>）をもっています。当研究室では、この性質を利用して、土の中の多くの微生物から運動性放線菌だけを選んで集める分離法を開発しました。</p>
+      <p>ゲームでは、あなたが遊走子になって、においの濃い方へ泳いで捕集口を目指します。</p>
+    </section>
+    <section>
+      <h2>研究をもっと知る</h2>
+      <ul>
+        <li><a href="../../research/motile-actinomycetes/">泳ぐ放線菌の高度選択分離法</a></li>
+        <li><a href="../../research/isolation/">放線菌に関する研究</a></li>
+        <li><a href="../soil-hunter/">ミニゲーム：SOIL HUNTER（放線菌を探す）</a></li>
+        <li><a href="../../join/">配属・進学を考えている方へ</a></li>
+      </ul>
+      <p class="note" style="margin-top:12px">※ 障害物やアイテム、キャラクターごとの能力の違いは、ゲームとして遊びやすくするための設定です。</p>
+    </section>
+  </aside>
+</main>
+
+<script>
+(function(){
+'use strict';
+var W=320,H=416,LEN=4200,TIME=60,PR=9;
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');cv.width=W;cv.height=H;ctx.imageSmoothingEnabled=false;
+var $=function(id){return document.getElementById(id)};
+var ov=$('ov'),panel=$('panel');
+
+/* ---------- 遊走子キャラクター ---------- */
+var CH=[
+ {n:'Actinoplanes',k:'アクチノプラネス属',type:'スピード型',sp:1.15,turn:.9,hp:2,src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB40lEQVR4Xs2WK08DQRSFB2hCAgICjpqm9ZWkpugKUPwAqrCkAgSpWEEqQDQEV0X/AwKBINQQTBMMClIBdSUgIKlacqbMZPYxc+f2EfiSzW5nZ+45e+88KsQfMzeu/sZaKYyP7b/fs+OxBwCId06XEt7LR99sE/PcDNjEAUylZcYFy4Apnq8cywuYz1wTGW4GFC/XjdRnLqwMzIKJDNjKwCG1BGoiUctqGmWILEMl/PZ4Ij8iW6wnTLhWAeAuRV0CBA72VsnsISsQSYMrroF4q1YJzTu1nvF+nP7WL1SClLCJacCVOvQLX2/kFY+vS6AmHDXxJgVlNk2wNyJbhlwrBx+VLdblHAvaH9JE0C6FaPc+jPQKuVx0JiFbHcr3aZlEDLSrO/p5GcAASjgOjPiUk9wJI+KbDSEvD66CZWu5TJwZSIg/jE4/X7q9jNgOvpyZIDOgYYr74m9gRvAN7NyK3MF60o6tnYBtIJffTQ1pa6dgG5g2fjvhc22kW2iK3vlAezBLYbbr/gsXpF8/A4WmNVBvqyxyd53I+66HsILcCbm7INa+gtoDADkH5EFSHUYC2+CKAzIDCnUYYYt1ga8GPucA8JsDvwFh4qk/GnLY+oz4ONtf0b99xcdC/RWLD7a1/3t+AAIH7GZYOEB0AAAAAElFTkSuQmCC',
+  d:'胞子が鞭毛で水中を泳ぐ「運動性放線菌」の代表。化学物質に引き寄せられる性質（走化性）や、花粉に集まる性質を利用すると、土から選んで分離できる。'},
+ {n:'Dactylosporangium',k:'ダクチロスポランギウム属',type:'バランス型',sp:1.0,turn:1.0,hp:3,src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABdklEQVR4XmNgGAUUAikhi/8UGkE+AFlecu/9f0ocwUSu9SBLo85sB2sH0eQ6giQHYLOkW1EAww+kOIZoB8B8jG546f0PKA7ApQ4XIMoB+IIbOQTwqaPIATCALbjRQwAEsKmjigOItQybOqo4YDQEBmUIYAM0SwO0AIzEGgorgOT2bcCr5ZFTAFz+2bsTBM0nqAAEQJYTshgdgBxCjAMIloTIloMSIbGFjMSMfqLqBLwhgG45KYkLBH7dus/wIqMQb0gQDAEYINVyYgHRDqAVINkBx/XFGZ4HZmG4B5c4IUCyAxSUgrGaiUucECDZAdQGLMQYeHz/CbAyS0cLBsn10+BaQFEB4sNoGICpN5YWJ2g8UQ4AWYwNYLMcBIixGAYIloSkloKgvA8DhMoAECCYBkDFKahYRTYYFyDVchAgGAIwAKuMQEUsPgDyNQgQUw+AAFFpAGYgyBF/HjwF89909KC4Q6SiBM4n1nKyAMgR2DoeuMQHPQAAxCazRbD9SwMAAAAASUVORK5CYII=',
+  d:'指のような形の胞子のうをつくる希少放線菌。泳ぐ胞子をもち、γ-コリジンに引き寄せられる性質を使った分離法で効率よく見つけられる。'},
+ {n:'Catenuloplanes',k:'カテヌロプラネス属',type:'テクニック型',sp:.95,turn:1.3,hp:3,src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABtElEQVR4Xu2WLVMDMRCGA8MvQHKm8AtgBoGAVuD4MggsAnwFOEQFrgYNiNpaDvAtzIBg5joYcMUUiYCpLvOmbCZJk8sGTiDumam4fOz73u4mVyFKSkpKCmBudmXEDWOvneZu9IGAjaVVrwnMk2hobTQIeL5+pARsMD96eJW/0NpoOAFtA65SzUQrR/D+8TiVbO7L/hjctOROPGOcwvy6BxCkkd2LvPoDXcxVougM+Dqexl2ClAmYJaghVSpCkMBgey93aZK2nW+O/VoZZOaQQVYG5OaAMEHrklQYtbaBODITzIAhXt8Zxzm7CiVMZJ9fYqtza5TEVaZcAxPiDGEd3YRdAuoV/imIFA9B2eAbKICLk0vcAzISHd94A626qHTvJu34xoVQJ+Dw9ECJUxNGG6gs7Dpz4Rt3QeKYYx3Dv6CffWBfVDwDi/NjD72+eKuuKT96KfRxtb77bHi3xfkZ6PW9SYCw3ROZJkxN5xIHcRcRA5x9wr6IXASbUH5I0rYR2EesOCsDBF0c17UNrwGAt3Y1mw9eE/50L0y8DIcy1vFTx4jZXK6pZ1+9C0H/k6njG//3fAO0N/tEW7sZWgAAAABJRU5ErkJggg==',
+  d:'泳ぐ胞子が鎖のように並ぶ、とても珍しい放線菌。Catenuloplanes japonicus の走化性（化学物質に向かって泳ぐ性質）が詳しく調べられている。'}
+];
+CH.forEach(function(c){c.img=new Image();c.img.src=c.src});
+var sel=1; // 最初はバランス型（ダクチロスポランギウム属）を選択
+
+/* ---------- 保存 ---------- */
+var KEY='zoosporerun.v1',save={best:0,clears:0};
+try{var s0=JSON.parse(localStorage.getItem(KEY));if(s0&&typeof s0.best==='number')save=s0}catch(e){}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}}
+
+/* ---------- 音 ---------- */
+var ac=null,muted=false;
+function initAudio(){if(ac)return;try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){ac=null}}
+function sfx(f,d,type,v,slide,delay){
+  if(muted||!ac)return;d=d||.08;v=v||.04;var t=ac.currentTime+(delay||0);
+  var o=ac.createOscillator(),g=ac.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t);
+  if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.02);
+}
+function jingle(n,step,type){n.forEach(function(f,i){sfx(f,step*1.6,type||'square',.05,0,i*step)})}
+$('mute').addEventListener('click',function(){muted=!muted;this.textContent=muted?'♪ 音 OFF':'♪ 音 ON';this.setAttribute('aria-pressed',muted)});
+var state='title',timeLeft=TIME;
+/* ---------- BGM：SOIL HUNTER のテーマを調とテンポを変えて使用 ---------- */
+var bgmG=null,noiseBuf=null,bgmStep=0,bgmNext=null;
+var BG_LEAD=[ // [16分音符の位置, MIDI音名, 長さ]
+ [[0,74,3],[4,78,2],[6,81,2],[8,86,4],[12,85,2],[14,81,2]],
+ [[0,83,3],[4,81,2],[6,78,2],[8,81,4],[12,76,4]],
+ [[0,78,3],[4,83,2],[6,86,2],[8,85,3],[12,83,2],[14,81,2]],
+ [[0,79,4],[4,83,2],[6,86,2],[8,83,4],[12,81,2],[14,79,2]],
+ [[0,78,2],[2,81,2],[4,86,4],[8,85,2],[10,86,2],[12,88,4]],
+ [[0,85,3],[4,81,2],[6,85,2],[8,88,4],[12,85,4]],
+ [[0,86,3],[4,83,2],[6,79,2],[8,83,2],[10,86,2],[12,88,2],[14,86,2]],
+ [[0,85,4],[4,81,2],[6,83,2],[8,85,6],[14,81,2]]];
+var BG_ROOT=[50,45,47,43,50,45,43,45];
+var BG_CHORD=[[62,66,69],[64,69,73],[62,66,71],[62,67,71],[62,66,69],[64,69,73],[62,67,71],[64,69,73]];
+function mhz(m){return 440*Math.pow(2,(m-66)/12)}
+function bTone(m,t,d,type,v){
+  var o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(mhz(m),t);
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g);g.connect(bgmG);o.start(t);o.stop(t+d+.02);
+}
+function bDrum(t,kind){
+  var g=ac.createGain();g.connect(bgmG);
+  if(kind==='k'){var o=ac.createOscillator();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);
+    g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+.15);o.connect(g);o.start(t);o.stop(t+.17);return}
+  var n=ac.createBufferSource(),f=ac.createBiquadFilter(),sn=kind==='s';n.buffer=noiseBuf;f.type='highpass';f.frequency.value=sn?1500:7000;
+  g.gain.setValueAtTime(sn?.07:.02,t);g.gain.exponentialRampToValueAtTime(.0001,t+(sn?.12:.04));
+  n.connect(f);f.connect(g);n.start(t);n.stop(t+.14);
+}
+function bgmSched(s,t,sd){
+  var bar=s>>4,p=s&15,L=BG_LEAD[bar],i;
+  for(i=0;i<L.length;i++)if(L[i][0]===p){bTone(L[i][1],t,L[i][2]*sd*.95,'square',.028);bTone(L[i][1]-12,t,L[i][2]*sd*.95,'triangle',.03)}
+  if(p%2===0)bTone(p%4===0?BG_ROOT[bar]:BG_ROOT[bar]+12,t,sd*1.6,'triangle',.07);
+  if(p===2||p===6||p===10||p===14)BG_CHORD[bar].forEach(function(m){bTone(m,t,sd*1.8,'square',.011)});
+  if(p===0||p===8)bDrum(t,'k');
+  if(p===4||p===12)bDrum(t,'s');
+  if(p%2===0)bDrum(t,'h');
+}
+function bgmTick(){
+  if(!ac||muted||document.hidden||(state!=='play'&&state!=='modal')){bgmNext=null;return}
+  if(!bgmG){bgmG=ac.createGain();bgmG.connect(ac.destination);var n=ac.sampleRate*.3|0;noiseBuf=ac.createBuffer(1,n,ac.sampleRate);var d=noiseBuf.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1}
+  var now=ac.currentTime;
+  bgmG.gain.setTargetAtTime(state==='modal'?.3:1,now,.15);
+  if(bgmNext===null||bgmNext<now)bgmNext=now+.05;
+  var sd=60/156/4*(state==='play'&&timeLeft<=10?.7:1); // 残り10秒で約1.4倍速に
+  while(bgmNext<now+.3){bgmSched(bgmStep,bgmNext,sd);bgmNext+=sd;bgmStep=(bgmStep+1)&127}
+}
+setInterval(bgmTick,60);
+
+/* ---------- においの場（走化性） ---------- */
+var ph1=0,ph2=0;
+function xc(y){return Math.max(50,Math.min(270,160+95*Math.sin(y/240+ph1)+30*Math.sin(y/90+ph2)))}
+function smell(x,y){var d=x-xc(y),g=.5+.5*(1-y/LEN);return Math.exp(-d*d/(2*44*44))*g}
+
+/* ---------- コース生成 ---------- */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function irnd(n){return Math.floor(Math.random()*n)}
+var obs,items,amoebas,pl,cam,score,items_n,hp,stunUntil,slowUntil,boostUntil,invUntil,parts,floats,shake,held,tapX,deep;
+function gen(){
+  ph1=rnd(0,6.28);ph2=rnd(0,6.28);obs=[];items=[];amoebas=[];
+  for(var y=LEN-260;y>220;y-=rnd(70,120)){
+    var p=1-y/LEN,r=Math.random(),cx=xc(y);
+    if(r<.42){var rr=rnd(9,17),x=Math.random()<.35?cx+rnd(-20,20):rnd(24,296);obs.push({t:'sand',x:x,y:y,r:rr,seed:irnd(999)})}
+    else if(r<.68){obs.push({t:'bac',x:rnd(30,290),y:y,vx:rnd(18,40)*(Math.random()<.5?-1:1),ph:rnd(0,6)})}
+    else if(r<.88){var left=Math.random()<.5,len=rnd(70,120+p*40);obs.push({t:'hyp',x0:left?0:W,x1:left?len:W-len,y:y,br:rnd(.3,.7)})}
+    else obs.push({t:'sand',x:cx+rnd(-30,30),y:y,r:rnd(10,14),seed:irnd(999)});
+  }
+  for(var yy=LEN-500;yy>300;yy-=rnd(220,320))items.push({x:xc(yy)+rnd(-18,18),y:yy,got:false});
+  for(var ya=LEN-900;ya>500;ya-=rnd(650,850))amoebas.push({x:rnd(40,280),y:ya,vx:0,vy:0,ph:rnd(0,6)});
+  deep=[];for(var i=0;i<70;i++)deep.push({x:rnd(0,W),y:rnd(0,LEN+H),r:rnd(1,3),z:rnd(.3,.7)});
+}
+function reset(){
+  gen();var c=CH[sel];
+  pl={x:xc(LEN-30),y:LEN-30,vx:0,face:0};cam=pl.y-H*.72;score=0;items_n=0;hp=c.hp;timeLeft=TIME;
+  stunUntil=slowUntil=boostUntil=invUntil=0;parts=[];floats=[];shake=0;held=0;tapX=null;
+  floats.push({x:pl.x,y:pl.y-40,txt:'ピンクのにおいをたどれ！',t:0,life:2600,col:'#FFF7DC'});
+}
+
+/* ---------- 当たり判定 ---------- */
+function segDist(px,py,x0,y0,x1,y1){var dx=x1-x0,dy=y1-y0,t=((px-x0)*dx+(py-y0)*dy)/(dx*dx+dy*dy||1);t=Math.max(0,Math.min(1,t));var X=x0+dx*t,Y=y0+dy*t;return Math.hypot(px-X,py-Y)}
+function hyphaSegs(o){var s=[[o.x0,o.y,o.x1,o.y]],bx=o.x0+(o.x1-o.x0)*o.br;s.push([bx,o.y,bx+(o.x1-o.x0)*.3,o.y-18]);s.push([bx,o.y,bx+(o.x1-o.x0)*.25,o.y+16]);return s}
+function burst(x,y,col,n){for(var i=0;i<n;i++)parts.push({x:x,y:y,vx:rnd(-80,80),vy:rnd(-80,80),life:rnd(.3,.6),t:0,c:col})}
+function hit(kind,now){
+  if(now<invUntil)return;
+  if(kind==='sand'){stunUntil=now+350;invUntil=now+700;shake=6;pl.y+=14;pl.vx*=-.6;sfx(90,.08,'square',.05);floats.push({x:pl.x,y:pl.y-24,txt:'ゴツン！',t:0,life:900,col:'#E3D9B0'})}
+  else if(kind==='bac'){slowUntil=now+1500;invUntil=now+800;sfx(300,.12,'sawtooth',.03,120);floats.push({x:pl.x,y:pl.y-24,txt:'細菌にからまった！',t:0,life:1100,col:'#9FE6A0'})}
+  else if(kind==='hyp'){slowUntil=now+1200;invUntil=now+700;sfx(220,.1,'triangle',.04,110);floats.push({x:pl.x,y:pl.y-24,txt:'カビの菌糸にひっかかった！',t:0,life:1100,col:'#E8E4F2'})}
+  else if(kind==='amo'){hp--;invUntil=now+1500;shake=10;sfx(70,.25,'sawtooth',.06,40);burst(pl.x,pl.y,'#FF5F8F',14);floats.push({x:pl.x,y:pl.y-24,txt:'アメーバにかじられた！',t:0,life:1200,col:'#FF8FB0'});
+    if(hp<=0)end(false,now)}
+}
+
+/* ---------- 画面 ---------- */
+function openOv(){ov.classList.add('on')}
+function closeOv(){ov.classList.remove('on');panel.innerHTML=''}
+function focusFirst(){var b=panel.querySelector('.btn');if(b)try{b.focus({preventScroll:true})}catch(e){b.focus()}}
+function bars(n){return '■■■■■'.slice(0,n)+'□□□□□'.slice(0,5-n)}
+function statText(c){return '<b>'+c.k+'</b>（'+c.type+'）<br>泳ぐ速さ '+bars(c.sp>=1.1?5:c.sp>=1?3:2)+'　曲がりやすさ '+bars(c.turn>=1.2?5:c.turn>=1?3:2)+'　ライフ '+'♥♥♥'.slice(0,c.hp)}
+function showTitle(){
+  state='title';
+  panel.innerHTML='<p class="kicker">YAMANASHI UNIV. APPLIED MICROBIOLOGY LAB.</p><h1 class="title">ZOOSPORE<br>RUN</h1><p class="sub">ズースポア・ラン</p>'+
+   '<p class="story">乾かした土に液体を注ぐと、胞子のうから泳ぐ胞子（遊走子）が飛び出した！<br>化学物質の<b style="color:#FF8FB0">におい</b>をたどって、<b>'+TIME+'秒</b>以内に上の<b>捕集口</b>まで泳ぎきろう。</p>'+
+   '<p style="font-size:13px;margin:0">遊走子を選んでね</p><div class="picks" id="picks"></div><div class="stat" id="stat"></div>'+
+   '<div class="btns"><button class="btn" data-act="start">▶ START</button><button class="btn ghost" data-act="howto">遊び方</button></div>'+
+   (save.best?'<p class="hi">HIGH SCORE '+save.best+'　CLEAR ×'+save.clears+'</p>':'');
+  var box=$('picks');
+  CH.forEach(function(c,i){var b=document.createElement('button');b.type='button';b.className='pick'+(i===sel?' on':'');
+    var im=new Image();im.src=c.src;im.alt='';b.appendChild(im);
+    b.insertAdjacentHTML('beforeend','<span class="pn">'+c.n+'</span><span class="pt">'+c.type+'</span>');
+    b.setAttribute('aria-pressed',i===sel);
+    b.addEventListener('click',function(){sel=i;Array.prototype.forEach.call(box.children,function(x,j){x.classList.toggle('on',j===i);x.setAttribute('aria-pressed',j===i)});$('stat').innerHTML=statText(c);sfx(660,.04)});
+    box.appendChild(b)});
+  $('stat').innerHTML=statText(CH[sel]);
+  openOv();focusFirst();
+}
+function showHow(){
+  panel.innerHTML='<p class="kicker">HOW TO PLAY</p><ul class="howto">'+
+   '<li>遊走子は自動で上へ泳ぎます。<b>← →</b>（A・D）、画面下のボタン、または画面をタッチした方向へ左右に動かします。</li>'+
+   '<li><b style="color:#FF8FB0">ピンクのにおい</b>が濃いところほど速く泳げます（走化性）。上の「におい」メーターも目安に。</li>'+
+   '<li><b>砂つぶ</b>にぶつかると一瞬止まります。<b>細菌</b>や<b>カビの菌糸</b>にひっかかると、しばらく遅くなります。</li>'+
+   '<li><b>アメーバ</b>は近づくと追いかけてきます。かじられるとライフが1つ減ります。</li>'+
+   '<li><b>γ-コリジンの粒</b>（ピンクに光る粒）を取ると、3秒間スピードアップ！</li>'+
+   '<li>時間内に一番上の<b>捕集口</b>に入れば分離成功。残り時間とライフがボーナスになります。</li></ul>'+
+   '<div class="btns"><button class="btn" data-act="start">▶ START</button><button class="btn ghost" data-act="back">もどる</button></div>';
+  openOv();focusFirst();
+}
+function rankOf(ok,left){if(!ok)return '迷子の遊走子';if(left>=25&&hp===CH[sel].hp)return '走化性マスター';if(left>=12)return '一人前の遊走子';return 'ギリギリ遊走子'}
+function end(ok,now){
+  if(state!=='play')return;state='over';held=0;
+  var c=CH[sel],left=Math.max(0,Math.ceil(timeLeft)),dist=Math.round(Math.min(1,(LEN-pl.y)/LEN)*100);
+  var bonusT=ok?left*50:0,bonusH=ok?hp*300:0,base=ok?1000:dist*8;
+  score=base+bonusT+bonusH+items_n*100;
+  var rec=score>save.best;if(rec)save.best=score;if(ok)save.clears++;persist();
+  if(ok){jingle([523,659,784,1046,1318],.08);burst(pl.x,pl.y,'#FFE38A',24)}else jingle([523,440,349,262],.14,'triangle');
+  var txt='ZOOSPORE RUNで'+(ok?c.n+'を分離成功！':'捕集口まで'+dist+'%！')+' SCORE '+score+'（称号：'+rankOf(ok,left)+'）';
+  var url='https://twitter.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(location.href.split('#')[0])+'&hashtags='+encodeURIComponent('山梨大学,放線菌');
+  setTimeout(function(){
+    panel.innerHTML='<p class="kicker">'+(ok?'ISOLATED!':(hp<=0?'GAME OVER':'TIME UP!'))+'</p>'+
+      (ok?'<img class="chara" alt="" src="'+c.src+'"><p class="gname">'+c.n+'</p><p class="kana">'+c.k+'を分離成功！</p>'+
+          '<p class="desc">捕集口に入った遊走子は、寒天培地の上で育てられ、新しい株になります。<br>'+c.d+'</p>'
+         :'<p style="margin:4px 0">'+(dist>=80?'捕集口まであと少しだった……':'捕集口まではまだ遠い……')+'（到達 <b>'+dist+'%</b>）</p><p style="font-size:13px">においの濃いピンクの帯の中を泳ぐと速く進めます。</p>')+
+      '<p class="big">SCORE '+score+'</p>'+(rec?'<p class="kicker" style="color:#FF5F8F">NEW RECORD!</p>':'')+
+      '<p class="breakdown">'+(ok?'分離成功 1000 ＋ 残り'+left+'秒×50 ＋ ライフ'+hp+'×300':'到達 '+dist+'%×8')+' ＋ γ-コリジン'+items_n+'×100</p>'+
+      '<p class="rank">称号：<b>'+rankOf(ok,left)+'</b></p>'+
+      '<div class="btns"><button class="btn" data-act="start">もう一度</button><button class="btn alt" data-act="title">遊走子を選ぶ</button></div>'+
+      '<div class="btns"><a class="btn ghost" href="../../research/motile-actinomycetes/">研究内容を読む</a><a class="btn ghost" href="'+url+'" target="_blank" rel="noopener">Xでシェア</a></div>';
+    openOv();focusFirst();
+  },ok?900:600);
+}
+function start(){bgmStep=0;bgmNext=null;initAudio();if(ac&&ac.state==='suspended')ac.resume();reset();closeOv();state='play';jingle([587,880,1175],.07);try{cv.focus({preventScroll:true})}catch(e){}}
+panel.addEventListener('click',function(e){var b=e.target.closest('[data-act]');if(!b)return;var a=b.dataset.act;
+  if(a==='start')start();else if(a==='howto')showHow();else if(a==='back'||a==='title')showTitle()});
+
+/* ---------- 入力 ---------- */
+var KEYS={ArrowLeft:-1,ArrowRight:1,a:-1,d:1,A:-1,D:1};
+document.addEventListener('keydown',function(e){var d=KEYS[e.key];if(state==='play'&&d){held=d;e.preventDefault()}else if(state==='play'&&(e.key==='ArrowUp'||e.key==='ArrowDown'||e.key===' '))e.preventDefault()});
+document.addEventListener('keyup',function(e){var d=KEYS[e.key];if(d&&held===d)held=0});
+window.addEventListener('blur',function(){held=0;tapX=null});
+Array.prototype.forEach.call(document.querySelectorAll('#pad button'),function(b){var d=+b.dataset.d;
+  b.addEventListener('pointerdown',function(e){e.preventDefault();held=d;b.classList.add('on');try{b.setPointerCapture(e.pointerId)}catch(_){}});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){b.addEventListener(ev,function(){if(held===d)held=0;b.classList.remove('on')})});
+  b.addEventListener('contextmenu',function(e){e.preventDefault()})});
+function ptrX(e){var r=cv.getBoundingClientRect();return (e.clientX-r.left)/r.width*W}
+cv.addEventListener('pointerdown',function(e){if(state!=='play')return;e.preventDefault();tapX=ptrX(e);try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+cv.addEventListener('pointermove',function(e){if(tapX!==null)tapX=ptrX(e)});
+['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){cv.addEventListener(ev,function(){tapX=null})});
+
+/* ---------- 更新 ---------- */
+function update(dt,now){
+  for(var i=0;i<parts.length;i++){var p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt}parts=parts.filter(function(p){return p.t<p.life});
+  floats.forEach(function(f){f.t+=dt*1000});floats=floats.filter(function(f){return f.t<f.life});
+  if(shake>0)shake=Math.max(0,shake-dt*40);
+  obs.forEach(function(o){if(o.t==='bac'){o.x+=o.vx*dt;if(o.x<16||o.x>W-16)o.vx*=-1}});
+  if(state!=='play'){hud(now);return}
+  if(!document.hidden){timeLeft-=dt;if(timeLeft<=0){timeLeft=0;end(false,now);return}}
+  var c=CH[sel],dir=held;
+  if(tapX!==null){var dx=tapX-pl.x;dir=Math.abs(dx)<6?0:(dx>0?1:-1)}
+  if(dir)pl.face=dir;
+  var target=dir*170*c.turn;pl.vx+=(target-pl.vx)*Math.min(1,dt*6*c.turn);
+  pl.x=Math.max(14,Math.min(W-14,pl.x+pl.vx*dt));
+  var sm=smell(pl.x,pl.y),v=(22+140*sm)*c.sp;
+  if(now<boostUntil)v*=1.6;if(now<slowUntil)v*=.45;if(now<stunUntil)v=0;
+  pl.y-=v*dt;
+  /* アメーバ */
+  amoebas.forEach(function(a){var dx=pl.x-a.x,dy=pl.y-a.y,d=Math.hypot(dx,dy);
+    if(d<170){a.vx+=(dx/d*34-a.vx)*dt*2;a.vy+=(dy/d*34-a.vy)*dt*2}else{a.vx*=.98;a.vy*=.98}
+    a.x+=a.vx*dt;a.y+=a.vy*dt;if(d<PR+15)hit('amo',now)});
+  if(state!=='play')return;
+  /* 障害物 */
+  for(var j=0;j<obs.length;j++){var o=obs[j];if(Math.abs(o.y-pl.y)>60)continue;
+    if(o.t==='sand'&&Math.hypot(o.x-pl.x,o.y-pl.y)<o.r+PR-2)hit('sand',now);
+    else if(o.t==='bac'&&Math.abs(o.x-pl.x)<12+PR-3&&Math.abs(o.y-pl.y)<4+PR-2)hit('bac',now);
+    else if(o.t==='hyp'&&hyphaSegs(o).some(function(s){return segDist(pl.x,pl.y,s[0],s[1],s[2],s[3])<PR-1}))hit('hyp',now)}
+  /* γ-コリジン */
+  items.forEach(function(it){if(!it.got&&Math.hypot(it.x-pl.x,it.y-pl.y)<PR+9){it.got=true;items_n++;boostUntil=now+3000;score+=100;
+    jingle([880,1175,1568],.04,'triangle');burst(it.x,it.y,'#FF8FB0',12);floats.push({x:it.x,y:it.y-20,txt:'γ-コリジン！ ダッシュ',t:0,life:1100,col:'#FF8FB0'})}});
+  if(pl.y<=46){pl.y=46;end(true,now);return}
+  var tc=pl.y-H*.72;cam+=(tc-cam)*Math.min(1,dt*6);cam=Math.max(-20,Math.min(LEN-H+20,cam));
+  hud(now);
+}
+var hv={};
+function setT(id,v){if(hv[id]!==v){hv[id]=v;$(id).textContent=v}}
+function hud(now){
+  setT('vTime',Math.ceil(timeLeft));setT('vScore',state==='play'?items_n*100:score);
+  $('hTime').className=timeLeft<=10&&state==='play'?'t-low':'';
+  if(pl){var sm=Math.round(smell(pl.x,pl.y)*100);if(hv.sm!==sm){hv.sm=sm;$('vSmell').style.width=sm+'%'}
+    var pr=Math.round(Math.min(1,(LEN-pl.y)/LEN)*100);if(hv.pr!==pr){hv.pr=pr;$('vProg').style.width=pr+'%'}
+    setT('vHp','♥♥♥'.slice(0,Math.max(0,hp))+'♡♡♡'.slice(0,Math.max(0,CH[sel].hp-hp)))}
+}
+
+/* ---------- 描画 ---------- */
+function sy(y){return Math.round(y-cam)}
+function draw(now){
+  ctx.save();if(shake)ctx.translate(Math.round(rnd(-shake,shake)/2)*2,0);
+  var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#123A5C');g.addColorStop(1,'#0B1A33');ctx.fillStyle=g;ctx.fillRect(-8,0,W+16,H);
+  /* 奥の土の粒 */
+  deep.forEach(function(d){var yy=((d.y-cam*d.z)%(LEN+H)+(LEN+H))%(LEN+H)-20;if(yy<-4||yy>H+4)return;ctx.fillStyle='rgba(205,239,247,'+(d.z*.25)+')';ctx.fillRect(Math.round(d.x),Math.round(yy),d.r,d.r)});
+  /* においの場 */
+  for(var yy=0;yy<H;yy+=8){var wy=yy+cam+4;for(var x=0;x<W;x+=8){var s=smell(x+4,wy);if(s<.06)continue;
+    ctx.fillStyle='rgba(255,95,143,'+(s*.42).toFixed(3)+')';ctx.fillRect(x,yy,8,8)}}
+  /* においの粒（流れ） */
+  ctx.fillStyle='rgba(255,180,210,.7)';for(var k=0;k<26;k++){var wy2=cam+((k*53+now*.03)%H),x2=xc(wy2)+Math.sin(k*1.7+now/600)*40;ctx.fillRect(Math.round(x2),sy(wy2),2,2)}
+  /* 壁（土） */
+  ctx.fillStyle='#4A3328';ctx.fillRect(0,0,6,H);ctx.fillRect(W-6,0,6,H);ctx.fillStyle='#7A5440';for(var wy3=Math.floor(cam/24)*24;wy3<cam+H;wy3+=24){ctx.fillRect(4,sy(wy3),4,6);ctx.fillRect(W-8,sy(wy3+12),4,6)}
+  /* 捕集口 */
+  var gy=sy(0);if(gy>-80){ctx.fillStyle='#CDEFF7';ctx.fillRect(0,gy,W,26);ctx.fillStyle='#0F8FA8';for(var gx=0;gx<W;gx+=8)ctx.fillRect(gx,gy+20,4,6);
+    ctx.fillStyle='#1F2152';ctx.font='12px "DotGothic16",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('▼ 捕集口（γ-コリジン液） ▼',W/2,gy+11);ctx.textAlign='left';
+    ctx.fillStyle='rgba(255,227,138,'+(.25+.15*Math.sin(now/200))+')';ctx.fillRect(0,gy+26,W,10)}
+  /* スタート地点 */
+  var sy0=sy(LEN);if(sy0<H+40){ctx.fillStyle='#4A3328';ctx.fillRect(0,sy0,W,60);ctx.fillStyle='#7A5440';for(var sx=0;sx<W;sx+=12)ctx.fillRect(sx,sy0,6,4);
+    ctx.fillStyle='#FFB23F';ctx.beginPath();ctx.arc(W/2,sy0+2,10,Math.PI,0);ctx.fill()}
+  /* 障害物 */
+  obs.forEach(function(o){var oy=sy(o.y);if(oy<-60||oy>H+60)return;
+    if(o.t==='sand'){ctx.fillStyle='#6E6890';ctx.beginPath();ctx.arc(o.x,oy,o.r,0,7);ctx.fill();ctx.fillStyle='#8F89B4';ctx.beginPath();ctx.arc(o.x-o.r*.3,oy-o.r*.3,o.r*.45,0,7);ctx.fill();ctx.fillStyle='#4C4670';ctx.fillRect(Math.round(o.x+o.r*.2),Math.round(oy+o.r*.2),3,3)}
+    else if(o.t==='bac'){ctx.save();ctx.translate(Math.round(o.x),oy);ctx.rotate(Math.sin(now/300+o.ph)*.3);ctx.fillStyle='#7CCB5A';ctx.fillRect(-12,-4,24,8);ctx.fillStyle='#9FE6A0';ctx.fillRect(-10,-3,20,2);
+      ctx.strokeStyle='#5FA84A';ctx.lineWidth=1;ctx.beginPath();for(var q=0;q<6;q++){ctx.moveTo(-12+q*5,4);ctx.lineTo(-13+q*5,8+Math.sin(now/90+q)*2)}ctx.stroke();ctx.restore()}
+    else if(o.t==='hyp'){ctx.strokeStyle='#E8E4F2';ctx.lineWidth=3;ctx.beginPath();hyphaSegs(o).forEach(function(s){ctx.moveTo(s[0],sy(s[1]));ctx.lineTo(s[2],sy(s[3]))});ctx.stroke();
+      ctx.fillStyle='#fff';hyphaSegs(o).forEach(function(s){ctx.fillRect(Math.round(s[2])-2,sy(s[3])-2,4,4)})}});
+  /* γ-コリジン */
+  items.forEach(function(it){if(it.got)return;var iy=sy(it.y);if(iy<-20||iy>H+20)return;var pu=Math.sin(now/150)*1.5;
+    ctx.fillStyle='rgba(255,143,176,.35)';ctx.beginPath();ctx.arc(it.x,iy,11+pu,0,7);ctx.fill();ctx.fillStyle='#FF5F8F';ctx.beginPath();ctx.arc(it.x,iy,6,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(Math.round(it.x)-3,iy-3,2,2)});
+  /* アメーバ */
+  amoebas.forEach(function(a){var ay=sy(a.y);if(ay<-40||ay>H+40)return;ctx.fillStyle='rgba(197,155,255,.75)';ctx.beginPath();
+    for(var i=0;i<=16;i++){var an=i/16*6.283,r=16+Math.sin(an*3+now/250+a.ph)*3+Math.sin(an*5-now/180)*2;var X=a.x+Math.cos(an)*r,Y=ay+Math.sin(an)*r;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}ctx.fill();
+    ctx.fillStyle='#5B3E8E';ctx.beginPath();ctx.arc(a.x+2,ay-1,5,0,7);ctx.fill();ctx.fillStyle='#1F2152';ctx.fillRect(Math.round(a.x)-7,ay-6,3,3);ctx.fillRect(Math.round(a.x)+4,ay-6,3,3)});
+  /* 遊走子（プレイヤー） */
+  if(pl){var px=Math.round(pl.x),py=sy(pl.y),blink=now<invUntil&&Math.floor(now/80)%2;
+    if(!blink){ctx.strokeStyle=now<boostUntil?'#FF8FB0':'#CDEFF7';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px,py+10);
+      for(var f=1;f<=6;f++)ctx.lineTo(px+Math.sin(now/60+f)*3*(f/3),py+10+f*4);ctx.stroke();
+      var img=CH[sel].img;if(img.complete&&img.naturalWidth)ctx.drawImage(img,px-14,py-16,28,28);
+      if(now<slowUntil){ctx.fillStyle='rgba(159,230,160,.5)';ctx.fillRect(px-12,py-14,24,24)}
+      if(now<boostUntil){ctx.strokeStyle='rgba(255,143,176,.8)';ctx.beginPath();ctx.arc(px,py-2,17+Math.sin(now/60)*2,0,7);ctx.stroke()}}}
+  parts.forEach(function(p){ctx.fillStyle=p.c;ctx.fillRect(Math.round(p.x),sy(p.y),3,3)});
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='12px "DotGothic16",monospace';
+  floats.forEach(function(f){var q=f.t/f.life;ctx.globalAlpha=1-Math.max(0,q-.6)/.4;var fx=Math.max(70,Math.min(W-70,f.x)),fy=sy(f.y)-q*24;
+    ctx.fillStyle='#000';ctx.fillText(f.txt,fx+1,fy+1);ctx.fillStyle=f.col;ctx.fillText(f.txt,fx,fy);ctx.globalAlpha=1});
+  ctx.textAlign='left';
+  if(state==='play'&&timeLeft<=10&&Math.floor(now/250)%2){ctx.strokeStyle='#FF5F8F';ctx.lineWidth=4;ctx.strokeRect(2,2,W-4,H-4)}
+  ctx.restore();
+}
+var last=performance.now();
+function loop(now){var dt=Math.min(.05,(now-last)/1000);last=now;update(dt,now);draw(now);requestAnimationFrame(loop)}
+reset();showTitle();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
